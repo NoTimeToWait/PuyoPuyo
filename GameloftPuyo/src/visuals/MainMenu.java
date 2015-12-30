@@ -26,13 +26,14 @@ public class MainMenu extends JFrame{
 		super(title);
 	}
 	
-	public static JFrame createView(GameContext gameContext, int width, int height, String title) {
+	public static MainMenu createView(GameContext gameContext, int width, int height, String title) {
 		MainMenu menu = new MainMenu(title);
 		menu.setSize(width, height);
 		menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//menu.setLayout(new BorderLayout());
 		menu.gameContext = gameContext;
 		menu.setBackground(Color.GRAY);
+		menu.switchToMenuPane();
 		return menu;
 	}
 	
@@ -72,6 +73,8 @@ public class MainMenu extends JFrame{
 					System.exit(0);
 				}
 			});
+			btnPane.add(continueBtn);
+			continueBtn.setVisible(false);
 			btnPane.add(startBtn);
 			btnPane.add(optionsBtn);
 			btnPane.add(exitBtn);

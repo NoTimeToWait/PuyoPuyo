@@ -19,7 +19,8 @@ public class GameField {
 	 */
 	private FieldCell[][] stagingArea; 
 	
-	private ArrayList<GameObject> gameObjects; 
+	private ArrayList<GameObject> gameObjects;
+	private ArrayList<Puyo> playerPuyo;
 	
 	private ChainCombo chainCombo;
 	
@@ -52,14 +53,14 @@ public class GameField {
 	/**
 	 * dispatch a new tick to the game field
 	 */
-	public void dispatchTick() {
+	public boolean dispatchTick() {
 		tickCount++;
 		if (Math.abs(tickCount-chainCombo.tick)>2) {
 			player.updateScore(chainCombo.getScore());
 			chainCombo=null;
 		}
 		updateField();
-		
+		return true;
 	}
 	
 	private void updateField() {
