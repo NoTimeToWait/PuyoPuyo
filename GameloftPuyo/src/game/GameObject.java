@@ -10,7 +10,14 @@ public class GameObject {
 	/**
 	 * color attribute which is 0 for any non-Puyo object
 	 */
-	protected int color=0;
+	protected int color=UNKNOWN;
+	
+	public static int UNKNOWN = 0x00000000;
+	public static int RED = 0x00FF0000;
+	public static int GREEN = 0x0000FF00;
+	public static int BLUE = 0x000000FF;
+	public static int YELLOW = 0x00FFFF00;
+	
 	public GameObject() {
 		//this.id = 
 		state = GameObjectState.UNKNOWN;

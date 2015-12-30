@@ -1,7 +1,15 @@
 package engine;
 
 public class Player {
-		public void updateScore(int bonusPoints) {
-			
-		}
+	
+	private int score;
+	
+	public void updateScore(int bonusPoints) {
+		score+=bonusPoints;
+	}
+	
+	public int getScore() {
+		return score;
+	}
+		
 }

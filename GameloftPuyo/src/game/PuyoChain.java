@@ -47,4 +47,9 @@ public class PuyoChain {
 	public Collection<Puyo> getChain() {
 		return puyos;
 	}
+	
+	public void unchain() {
+		for (Puyo puyo:puyos)
+			puyo.setState(GameObjectState.FALLING_FAST);
+	}
 }

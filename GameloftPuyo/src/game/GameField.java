@@ -64,14 +64,7 @@ public class GameField {
 	
 	private void updateField() {
 		
-		for (int j=height-2; j>=0; j--)
-			for (int i=0; i<width; i++)
-				if (cells[i][j].isPuyo() & !cells[i][j].getState().isFixed()) {
-					cells[i][j+1].fill(cells[i][j].gameObject);
-					cells[i][j].release();
-				}
 		
-		//update graphics
 		
 		//fixate objects
 		for (int j=height-1; j>=0; j--)
@@ -104,10 +97,24 @@ public class GameField {
 				else chainCombo.add(chain);
 				for (Puyo puyo:chain.getChain()) 
 					release(puyo);
-				
-				
 			}
 		}
+		
+
+		//update graphics
+		
+		//drop down after release
+		for (int j=height-2; j>=0; j--)
+			for (int i=0; i<width; i++)
+				if (cells[i][j].isPuyo() && !cells[i][j+1].isEmpty()) {
+					cells[i][j].gameObject.setState(GameObjectState.FALLING_FAST);
+					cells[i][j+1].fill(cells[i][j].gameObject, i, j);
+					cells[i][j].release();
+					for (PuyoChain chain:chains) 
+						if (chain.contains((Puyo)cells[i][j+1].gameObject) && chain.size()==2)
+							chain.unchain();
+				}
+		
 		
 	}
 	
@@ -147,8 +154,33 @@ public class GameField {
 		cells[object.getColumn()][object.getLine()].release();
 	}
 	
-	private void spawn(GameObject object, int column, int line) {
-		if (cells[column][line].fill(object)) gameObjects.add(object);
+	private boolean spawn(GameObject object, int column, int line, boolean isUnderControl) {
+		if (cells[column][line].fill(object, column, line)) {
+			gameObjects.add(object);
+			object.setState(isUnderControl? GameObjectState.FALLING_SLOW:GameObjectState.FALLING_FAST);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * TODO: make spawn as transaction
+	 * @param color1
+	 * @param color2
+	 * @return
+	 */
+	public boolean spawnPlayerTuple(int color1, int color2) {
+		Puyo puyo = new Puyo(color1);
+		if (spawn(puyo, width/2, 0, true)) {
+				if (spawn(new Puyo(color2), width/2, 1, true))
+					return true;
+				else release(puyo);
+		}
+		return false;
+	}
+	
+	public void prepareNextTuple() {
+		
 	}
 	
 	public class FieldCell {
@@ -197,9 +229,10 @@ public class GameField {
 		 * @param gameObject game object to contain 
 		 * @return false if cell is not empty and true otherwise
 		 */
-		protected boolean fill(GameObject gameObject) {
+		protected boolean fill(GameObject gameObject, int column, int line) {
 			if (!isEmpty()) return false;
 			this.gameObject = gameObject;
+			gameObject.setCoordinates(column, line);
 			return true;
 		}
 	}
