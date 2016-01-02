@@ -21,25 +21,15 @@ public class GameObject {
 	}
 	
 	protected void setCoordinates(int column, int line) {
-		x = column; y = line*Options.FALL_ITERATIONS_COUNT;
+		x = column; y = line;
 	}
-	
-	protected void drop() {
-		y++;
-		if (state.equals(GameObjectState.FALLING_FAST) && Options.FALL_ITERATIONS_COUNT>1)
-			setCoordinates(getColumn(), getLine()+1);
-	}
-	
-	protected int getFallIteration(){
-		return y;
-	}
-	
-	public int getX() {
+			
+	public int getDrawX() {
 		return x*Options.CELL_WIDTH;
 	}
 	
-	public int getY() {
-		return y*Options.CELL_WIDTH/Options.FALL_ITERATIONS_COUNT;
+	public int getDrawY() {
+		return y*Options.CELL_WIDTH;
 	}
 	
 	public int getColumn() {
@@ -47,8 +37,7 @@ public class GameObject {
 	}
 	
 	public int getLine() {
-		//return y/Options.FALL_ITERATIONS_COUNT;
-		return (int)Math.ceil((double)getFallIteration()/Options.FALL_ITERATIONS_COUNT);
+		return y;
 	}
 	
 	public GameObjectState getState() { 

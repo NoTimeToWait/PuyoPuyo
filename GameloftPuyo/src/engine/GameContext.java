@@ -38,7 +38,7 @@ public class GameContext {
 						player.dispatchTick(GameContext.this.player);
 				}
 			};
-			gameTimer.schedule(tickDispatchTask, Options.GAME_TICK_TIME/Options.FALL_ITERATIONS_COUNT, Options.GAME_TICK_TIME/Options.FALL_ITERATIONS_COUNT);
+			gameTimer.schedule(tickDispatchTask, Options.GAME_TICK_TIME, Options.GAME_TICK_TIME);
 		}
 		TimerTask uiUdateTask = new TimerTask() {
 			@Override

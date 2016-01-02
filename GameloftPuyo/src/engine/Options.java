@@ -1,17 +1,19 @@
 package engine;
 
+import java.awt.event.KeyEvent;
+
 public class Options {
 	/**
 	 * time in milliseconds between game ticks
 	 */
-	public static int GAME_TICK_TIME = 300; 
+	public static int GAME_TICK_TIME = 150; 
 	
 	public static final int GRAPHICS_UPDATE_DELAY = 100;
 	
 	/**
 	 *  number of steps it takes to drop puyo down from one field cell to another below
 	 */
-	public static int FALL_ITERATIONS_COUNT = 3;
+	//public static int FALL_ITERATIONS_COUNT = 3;
 	
 	/**
 	 *  default game field dimensions
@@ -27,6 +29,23 @@ public class Options {
 	
 	public static int FRAMERATE = 30;
 	
+	/**
+	 * Keybindings
+	 */
+	
+	public static int PLAYER1_UP_KEY = KeyEvent.VK_UP;
+	public static int PLAYER1_DOWN_KEY = KeyEvent.VK_DOWN;
+	public static int PLAYER1_LEFT_KEY = KeyEvent.VK_LEFT;
+	public static int PLAYER1_RIGHT_KEY = KeyEvent.VK_RIGHT;
+	public static int PLAYER2_UP_KEY = KeyEvent.VK_W;
+	public static int PLAYER2_DOWN_KEY = KeyEvent.VK_S;
+	public static int PLAYER2_LEFT_KEY = KeyEvent.VK_A;
+	public static int PLAYER2_RIGHT_KEY = KeyEvent.VK_D;
+	
+	/**
+	 * Languages
+	 */
+	
 	public static String LANGUAGE = "ENG";
 	
 	/**
@@ -37,6 +56,10 @@ public class Options {
 		//if (LANGUAGE.equals("RUS")) return new StringsRU();
 		return new Strings();
 	}
+	
+	/**
+	 * Images
+	 */
 	
 	public final static String[] imgLinks = new String[] {
 			"img/puyo_red.png",

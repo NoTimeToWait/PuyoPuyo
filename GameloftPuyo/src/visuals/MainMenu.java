@@ -6,16 +6,22 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import engine.GameContext;
 import engine.Options;
 import engine.Player;
 import engine.Strings;
+import game.GameEvent;
 
 public class MainMenu extends JFrame{
 	
@@ -36,13 +42,68 @@ public class MainMenu extends JFrame{
 		MainMenu menu = new MainMenu(title);
 		menu.setSize(width, height);
 		menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//menu.setLayout(new BorderLayout());
 		menu.gameContext = gameContext;
 		menu.setBackground(Color.GRAY);
 		menu.getContentPane().add(new JPanel(), BorderLayout.WEST);
 		menu.getContentPane().add(new JPanel(), BorderLayout.EAST);
 		menu.switchToMenuPane();
+		
+		mapKeybindings(((JPanel)menu.getContentPane()).getInputMap());
+		AbstractAction p1LeftAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Player player = GameContext.getPlayer();
+				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_LEFT);
+			}
+		};
+		AbstractAction p1RightAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Player player = GameContext.getPlayer();
+				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_RIGHT);
+			}
+		};
+		AbstractAction p1UpAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Player player = GameContext.getPlayer();
+				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_UP);
+			}
+		};
+		AbstractAction p1DownAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Player player = GameContext.getPlayer();
+				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_DOWN);
+			}
+		};
+		AbstractAction p1DownReleasedAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Player player = GameContext.getPlayer();
+				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_DOWN_RELEASE);
+			}
+		};
+		ActionMap actionMap = ((JPanel)menu.getContentPane()).getActionMap();
+		actionMap.put("p1_left", p1LeftAction);
+		actionMap.put("p1_right", p1RightAction);
+		actionMap.put("p1_up", p1UpAction);
+		actionMap.put("p1_down", p1DownAction);
+		actionMap.put("p1_down_released", p1DownReleasedAction);
 		return menu;
+	}
+	
+	private static void mapKeybindings(InputMap inputMap) {
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_UP_KEY, 0), "p1_up");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_DOWN_KEY, 0), "p1_down");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_DOWN_KEY, 0, true), "p1_down_released");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_LEFT_KEY, 0), "p1_left");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_RIGHT_KEY, 0), "p1_right");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_UP_KEY, 0), "p2_up");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_DOWN_KEY, 0), "p2_down");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_DOWN_KEY, 0, true), "p2_down_released");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_LEFT_KEY, 0), "p2_left");
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_RIGHT_KEY, 0), "p2_right");
 	}
 	
 	private void switchToMenuPane() {

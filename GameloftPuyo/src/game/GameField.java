@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import engine.Options;
@@ -13,7 +14,7 @@ public class GameField {
 	/**
 	 * game field represented as an array of cells
 	 */
-	private FieldCell[][] cells;
+	public static FieldCell[][] cells;
 	/**
 	 * area where all puyos are prepared to drop onto the game field
 	 */
@@ -21,6 +22,7 @@ public class GameField {
 	
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Puyo> playerPuyo;
+	private ArrayList<Point> rotationPoints;
 	
 	private ChainCombo chainCombo;
 	
@@ -38,6 +40,11 @@ public class GameField {
 				cells[i][j] = new FieldCell();
 		playerPuyo = new ArrayList<Puyo>();
 		gameObjects = new ArrayList<GameObject>();
+		rotationPoints = new ArrayList<Point>();
+		rotationPoints.add(new Point(1,0));
+		rotationPoints.add(new Point(0,1));
+		rotationPoints.add(new Point(-1,0));
+		rotationPoints.add(new Point(0,-1));
 	}
 	
 	
@@ -45,8 +52,54 @@ public class GameField {
 	/**
 	 * dispatch an event to the game field
 	 */
-	public void dispatchEvent(GameEvent event) {
+	public boolean dispatchEvent(GameEvent event) {
+		if (event.equals(GameEvent.USERINPUT_LEFT)) {
+			for (Puyo puyo:playerPuyo)
+				if (puyo.getColumn()-1<0
+					|| !(cells[puyo.getColumn()-1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()-1][puyo.getLine()])))
+						return false;
+			for (Puyo puyo:playerPuyo) cells[puyo.getColumn()][puyo.getLine()].release();
+			for (Puyo puyo:playerPuyo) {
+				cells[puyo.getColumn()-1][puyo.getLine()].fill(puyo,puyo.getColumn()-1, puyo.getLine());
+				puyo.setCoordinates(puyo.getColumn()-1, puyo.getLine());
+			}
+		}
+		if (event.equals(GameEvent.USERINPUT_RIGHT)) {
+			for (Puyo puyo:playerPuyo)
+				if (puyo.getColumn()+1>=width
+					|| !(cells[puyo.getColumn()+1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()+1][puyo.getLine()])))
+						return false;
+			for (Puyo puyo:playerPuyo) cells[puyo.getColumn()][puyo.getLine()].release();
+			for (Puyo puyo:playerPuyo) {
+				cells[puyo.getColumn()+1][puyo.getLine()].fill(puyo,puyo.getColumn()+1, puyo.getLine());
+				puyo.setCoordinates(puyo.getColumn()+1, puyo.getLine());
+			}
+		}
+		if (event.equals(GameEvent.USERINPUT_UP)) {
+			int difX = playerPuyo.get(1).getColumn()-playerPuyo.get(0).getColumn();
+			int difY = playerPuyo.get(1).getLine()-playerPuyo.get(0).getLine();
+			int index = rotationPoints.indexOf(new Point(difX, difY));
+			for (int i=0; i<4; i++) {
+				Point rotationPoint = rotationPoints.get((index+1+i)%rotationPoints.size());
+				int col = playerPuyo.get(1).getColumn()+rotationPoint.x;
+				int line = playerPuyo.get(1).getLine()+rotationPoint.y;
+				if (isOutOfBounds(col, line)|| !cells[col][line].isEmpty()) continue;
+				cells[playerPuyo.get(0).getColumn()][playerPuyo.get(0).getLine()].release();
+				cells[col][line].fill(playerPuyo.get(0), col, line);
+				playerPuyo.get(0).setCoordinates(col, line);
+				break;
+			}
+			
+		}
+		if (event.equals(GameEvent.USERINPUT_DOWN)) 
+			for (Puyo puyo:playerPuyo)
+				puyo.setState(GameObjectState.FALLING_FAST);
 		
+		if (event.equals(GameEvent.USERINPUT_DOWN_RELEASE)) 
+			for (Puyo puyo:playerPuyo)
+				puyo.setState(GameObjectState.FALLING_SLOW);
+		
+		return true;
 	}
 	
 	/**
@@ -64,6 +117,10 @@ public class GameField {
 			if (puyo.getState().isFixed()) {
 				nextPlayerTuple = true; break;
 			}
+		if (nextPlayerTuple) 
+			for (Puyo puyo:playerPuyo)
+				if (!puyo.getState().isFixed()) 
+					puyo.setState(GameObjectState.FALLING_FAST);
 		if (nextPlayerTuple || playerPuyo.isEmpty()) spawnPlayerTuple(0,0);
 		return true;
 	}
@@ -112,9 +169,10 @@ public class GameField {
 			}
 		
 		//find chains with 4 elements or longer and release them
-		//boolean released = false;
+		boolean released = false;
 		for (PuyoChain chain:chains) {
 			if (chain.size()>3) {
+				released = true;
 				if (chainCombo==null) chainCombo = new ChainCombo(chain, tickCount);
 				else chainCombo.add(chain);
 				for (Puyo puyo:chain.getChain()) 
@@ -125,37 +183,26 @@ public class GameField {
 
 		//update graphics
 		
-		for (int j=height-1; j>=0; j--)
-			for (int i=0; i<width; i++)  
-				if (!cells[i][j].isEmpty()&&cells[i][j].gameObject.getState().isFalling()) {
-					cells[i][j].gameObject.drop();
-					if (Options.FALL_ITERATIONS_COUNT==1 || objectIsInNextCell(i,j)) {
-						cells[i][j+1].fill(cells[i][j].gameObject, i, j+1);
-						cells[i][j].release();
-					}
-				}
-		//change state to FALLING for all puyos hanging in air after release
-		for (int j=height-2; j>=0; j--)
-			for (int i=0; i<width; i++) 
-				if (!cells[i][j].isEmpty() && cells[i][j+1].isEmpty() 
-						&& !playerPuyo.contains(cells[i][j].gameObject)) { 
+		//change state to FALLING_FAST for all puyos hanging in air after chain release
+		if (released)
+			for (int j=height-2; j>=0; j--)
+				for (int i=0; i<width; i++) 
+					if (!cells[i][j].isEmpty() && !playerPuyo.contains(cells[i][j].gameObject))
+						if (cells[i][j+1].isEmpty() || cells[i][j+1].getState().isFalling()) {
 							cells[i][j].gameObject.setState(GameObjectState.FALLING_FAST);
-							cells[i][j].gameObject.drop();
-							cells[i][j+1].fill(cells[i][j].gameObject, i, j+1);
-							cells[i][j].release();
+						
 							for (PuyoChain chain:chains) 
-								if (chain.contains((Puyo)cells[i][j].gameObject) && chain.size()==2)
+								if (chain.contains((Puyo)cells[i][j+1].gameObject) && chain.size()==2)
 									chain.unchain();
-				}
+						}
 				
-				
+		//process fall
+		for (int j=height-2; j>=0; j--)
+			for (int i=0; i<width; i++)
+				if (!cells[i][j].isEmpty()) 
+					drop(cells[i][j].gameObject);
 	}
 	
-	private boolean objectIsInNextCell(int col, int line) {
-		if (cells[col][line].gameObject==playerPuyo.get(0))
-		System.out.println("Lines:"+line+" "+cells[col][line].gameObject.getLine() + " " + cells[col][line].gameObject.getFallIteration());
-		return line+1==cells[col][line].gameObject.getLine();
-	}
 	
 	/**
 	 * find any adjacent Puyo. 
@@ -175,20 +222,35 @@ public class GameField {
 			if (isOutOfBounds(neighbour_col, neighbour_line)
 					||chainmap[neighbour_col][neighbour_line]!=0) continue;
 			FieldCell neighbour = cells[neighbour_col][neighbour_line];
-			if (neighbour.isPuyo() && neighbour.gameObject.getType()==source.getType()) {
-				neighbour.gameObject.setState(GameObjectState.CHAINED);
-				chainmap[neighbour_col][neighbour_line]=chainNum;
-				findAdjacentPuyos(chainmap, (Puyo)neighbour.gameObject, adjacentPuyos);
+			if (neighbour.isPuyo()
+					&& neighbour.gameObject.getType()==source.getType() 
+					&& neighbour.getState().isFixed()) {
+						neighbour.gameObject.setState(GameObjectState.CHAINED);
+						chainmap[neighbour_col][neighbour_line]=chainNum;
+						findAdjacentPuyos(chainmap, (Puyo)neighbour.gameObject, adjacentPuyos);
 			}
 		}
 	}
 	
+	private boolean drop(GameObject obj) {
+		if (!obj.getState().isFalling()) return false;
+		//slow drop is 3 times slower 
+		if (obj.getState().equals(GameObjectState.FALLING_SLOW)&&tickCount%3!=0) return false;
+		if (cells[obj.getColumn()][obj.getLine()+1].fill(obj, obj.getColumn(), obj.getLine()+1)) {
+			cells[obj.getColumn()][obj.getLine()].release();
+			obj.setCoordinates(obj.getColumn(), obj.getLine()+1);
+			return true;
+		}
+		//System.out.println("Tick "+tickCount+" "+Integer.toHexString(obj.getType())+" "+obj.x+" "+obj.y);
+		return false;
+	}
+	
 	private boolean isOutOfBounds(int w, int h) {
 		return (w<0||h<0||w>=width||h>=height);
-		
 	}
 	
 	private void release(GameObject object) {
+		if (playerPuyo.contains(object)) prepareNextTuple();
 		gameObjects.remove(object);
 		cells[object.getColumn()][object.getLine()].release();
 	}
@@ -198,7 +260,6 @@ public class GameField {
 			gameObjects.add(object);
 			object.setCoordinates(column, line);
 			object.setState(isUnderControl? GameObjectState.FALLING_SLOW:GameObjectState.FALLING_FAST);
-			System.out.println(line+" "+object.x+" "+object.y);
 			return true;
 		}
 		return false;
@@ -224,14 +285,14 @@ public class GameField {
 	}
 	
 	public void prepareNextTuple() {
-		
+		playerPuyo = new ArrayList<Puyo>();
 	}
 	
 	public class FieldCell {
 		/**
 		 * gameObject game object in this cell
 		 */
-		private GameObject gameObject;
+		public GameObject gameObject;
 		/**
 		 * check whether this cell contains any game object
 		 * @return true if cell is empty
@@ -256,10 +317,9 @@ public class GameField {
 		
 		public boolean fixate(){
 			//if last fall iteration of last cell row
-			if (isEmpty()||gameObject.getFallIteration()%Options.FALL_ITERATIONS_COUNT!=0) return false;
-			
+			if (isEmpty()) return false;
 			gameObject.setState(GameObjectState.FIXED);
-			System.out.println("Fixate"+Integer.toHexString(gameObject.getType()));
+			//System.out.println("Fixate"+Integer.toHexString(gameObject.getType()));
 			return true;
 		}
 		
@@ -279,7 +339,6 @@ public class GameField {
 		protected boolean fill(GameObject gameObject, int column, int line) {
 			if (!isEmpty()) return false;
 			this.gameObject = gameObject;
-			//gameObject.setCoordinates(column, line);
 			return true;
 		}
 	}

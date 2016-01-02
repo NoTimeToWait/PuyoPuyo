@@ -1,5 +1,6 @@
 package engine;
 
+import game.GameEvent;
 import game.GameField;
 import game.GameObject;
 
@@ -22,6 +23,11 @@ public class Player implements NetworkPlayer {
 		//we need to verify the player who issued this call (that he is actually the host)
 		//and ensure that the receiver is ready to receive the call
 		if (!GameSession.isHost(dispatcher) || !isReady() || !gameField.dispatchTick()) return false;
+		return true;
+	}
+	
+	public boolean dispatchEvent(NetworkPlayer dispatcher, GameEvent event) {
+		if (!(dispatcher==GameContext.getPlayer()||GameSession.isHost(dispatcher)) || !isReady() || !gameField.dispatchEvent(event)) return false;
 		return true;
 	}
 	

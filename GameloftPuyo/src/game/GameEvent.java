@@ -1,5 +1,5 @@
 package game;
 
-public class GameEvent {
-
+public enum GameEvent {
+	USERINPUT_UP, USERINPUT_DOWN, USERINPUT_DOWN_RELEASE, USERINPUT_LEFT, USERINPUT_RIGHT, STATUS_WIN, STATUS_LOSE
 }
