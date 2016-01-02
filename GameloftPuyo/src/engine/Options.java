@@ -11,7 +11,7 @@ public class Options {
 	/**
 	 *  number of steps it takes to drop puyo down from one field cell to another below
 	 */
-	public static int FALL_ITERATIONS_COUNT = 3;
+	public static int FALL_ITERATIONS_COUNT = 32;
 	
 	/**
 	 *  default game field dimensions
