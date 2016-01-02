@@ -17,7 +17,7 @@ public class GameField {
 	/**
 	 * area where all puyos are prepared to drop onto the game field
 	 */
-	private FieldCell[][] stagingArea; 
+	//private FieldCell[][] stagingArea; 
 	
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Puyo> playerPuyo;
@@ -33,15 +33,14 @@ public class GameField {
 		this.width = width;
 		this.height = height;
 		cells = new FieldCell[width][height];
+		for (int i=0; i<width; i++)
+			for (int j=0; j<height; j++)
+				cells[i][j] = new FieldCell();
+		playerPuyo = new ArrayList<Puyo>();
+		gameObjects = new ArrayList<GameObject>();
 	}
 	
-	/**
-	 * get game tick count
-	 * @return elapsed game time in ticks
-	 */
-	public int getTickCount() {
-		return tickCount;
-	}
+	
 	
 	/**
 	 * dispatch an event to the game field
@@ -55,12 +54,34 @@ public class GameField {
 	 */
 	public boolean dispatchTick() {
 		tickCount++;
-		if (Math.abs(tickCount-chainCombo.tick)>2) {
+		if (chainCombo!=null && Math.abs(tickCount-chainCombo.tick)>2) {
 			player.updateScore(chainCombo.getScore());
 			chainCombo=null;
 		}
 		updateField();
+		boolean nextPlayerTuple = false;
+		for (Puyo puyo:playerPuyo)
+			if (puyo.getState().isFixed()) {
+				nextPlayerTuple = true; break;
+			}
+		if (nextPlayerTuple || playerPuyo.isEmpty()) spawnPlayerTuple(0,0);
 		return true;
+	}
+	
+	/**
+	 * get game tick count
+	 * @return elapsed game time in ticks
+	 */
+	public int getTickCount() {
+		return tickCount;
+	}
+	
+	public GameObject[] getObjectsToDraw(boolean all) {
+		if (all) return gameObjects.toArray(new GameObject[0]);
+		ArrayList<GameObject> result = new ArrayList<GameObject>();
+		for (GameObject obj:gameObjects)
+			if (!obj.getState().isFixed()) result.add(obj);
+		return result.toArray(new GameObject[0]);
 	}
 	
 	private void updateField() {
@@ -104,19 +125,36 @@ public class GameField {
 
 		//update graphics
 		
-		//drop down after release
-		for (int j=height-2; j>=0; j--)
-			for (int i=0; i<width; i++)
-				if (cells[i][j].isPuyo() && !cells[i][j+1].isEmpty()) {
-					cells[i][j].gameObject.setState(GameObjectState.FALLING_FAST);
-					cells[i][j+1].fill(cells[i][j].gameObject, i, j);
-					cells[i][j].release();
-					for (PuyoChain chain:chains) 
-						if (chain.contains((Puyo)cells[i][j+1].gameObject) && chain.size()==2)
-							chain.unchain();
+		for (int j=height-1; j>=0; j--)
+			for (int i=0; i<width; i++)  
+				if (!cells[i][j].isEmpty()&&cells[i][j].gameObject.getState().isFalling()) {
+					cells[i][j].gameObject.drop();
+					if (Options.FALL_ITERATIONS_COUNT==1 || objectIsInNextCell(i,j)) {
+						cells[i][j+1].fill(cells[i][j].gameObject, i, j+1);
+						cells[i][j].release();
+					}
 				}
-		
-		
+		//change state to FALLING for all puyos hanging in air after release
+		for (int j=height-2; j>=0; j--)
+			for (int i=0; i<width; i++) 
+				if (!cells[i][j].isEmpty() && cells[i][j+1].isEmpty() 
+						&& !playerPuyo.contains(cells[i][j].gameObject)) { 
+							cells[i][j].gameObject.setState(GameObjectState.FALLING_FAST);
+							cells[i][j].gameObject.drop();
+							cells[i][j+1].fill(cells[i][j].gameObject, i, j+1);
+							cells[i][j].release();
+							for (PuyoChain chain:chains) 
+								if (chain.contains((Puyo)cells[i][j].gameObject) && chain.size()==2)
+									chain.unchain();
+				}
+				
+				
+	}
+	
+	private boolean objectIsInNextCell(int col, int line) {
+		if (cells[col][line].gameObject==playerPuyo.get(0))
+		System.out.println("Lines:"+line+" "+cells[col][line].gameObject.getLine() + " " + cells[col][line].gameObject.getFallIteration());
+		return line+1==cells[col][line].gameObject.getLine();
 	}
 	
 	/**
@@ -137,7 +175,7 @@ public class GameField {
 			if (isOutOfBounds(neighbour_col, neighbour_line)
 					||chainmap[neighbour_col][neighbour_line]!=0) continue;
 			FieldCell neighbour = cells[neighbour_col][neighbour_line];
-			if (neighbour.isPuyo() && neighbour.gameObject.getColor()==source.getColor()) {
+			if (neighbour.isPuyo() && neighbour.gameObject.getType()==source.getType()) {
 				neighbour.gameObject.setState(GameObjectState.CHAINED);
 				chainmap[neighbour_col][neighbour_line]=chainNum;
 				findAdjacentPuyos(chainmap, (Puyo)neighbour.gameObject, adjacentPuyos);
@@ -158,7 +196,9 @@ public class GameField {
 	private boolean spawn(GameObject object, int column, int line, boolean isUnderControl) {
 		if (cells[column][line].fill(object, column, line)) {
 			gameObjects.add(object);
+			object.setCoordinates(column, line);
 			object.setState(isUnderControl? GameObjectState.FALLING_SLOW:GameObjectState.FALLING_FAST);
+			System.out.println(line+" "+object.x+" "+object.y);
 			return true;
 		}
 		return false;
@@ -171,12 +211,15 @@ public class GameField {
 	 * @return
 	 */
 	public boolean spawnPlayerTuple(int color1, int color2) {
-		Puyo puyo = new Puyo(color1);
-		if (spawn(puyo, width/2, 0, true)) {
-				if (spawn(new Puyo(color2), width/2, 1, true))
+		playerPuyo = new ArrayList<Puyo>();
+		playerPuyo.add(color1==0? new Puyo() : new Puyo(color1));
+		if (spawn(playerPuyo.get(0), width/2, 0, true)) {
+			playerPuyo.add(color2==0? new Puyo() : new Puyo(color2));
+				if (spawn(playerPuyo.get(1), width/2, 1, true))
 					return true;
-				else release(puyo);
+				else release(playerPuyo.get(0));
 		}
+		playerPuyo = new ArrayList<Puyo>();
 		return false;
 	}
 	
@@ -199,7 +242,7 @@ public class GameField {
 		}
 		
 		public boolean isPuyo() {
-			return (!isEmpty()&&gameObject.getColor()>0);
+			return (!isEmpty()&&((gameObject.getType()&GameObject.PUYO_TYPE_MASK)==GameObject.PUYO_TYPE_MASK));
 		}
 			
 		public GameObjectState getState() {
@@ -212,8 +255,11 @@ public class GameField {
 		//}
 		
 		public boolean fixate(){
-			if (isEmpty()) return false;
+			//if last fall iteration of last cell row
+			if (isEmpty()||gameObject.getFallIteration()%Options.FALL_ITERATIONS_COUNT!=0) return false;
+			
 			gameObject.setState(GameObjectState.FIXED);
+			System.out.println("Fixate"+Integer.toHexString(gameObject.getType()));
 			return true;
 		}
 		
@@ -233,7 +279,7 @@ public class GameField {
 		protected boolean fill(GameObject gameObject, int column, int line) {
 			if (!isEmpty()) return false;
 			this.gameObject = gameObject;
-			gameObject.setCoordinates(column, line);
+			//gameObject.setCoordinates(column, line);
 			return true;
 		}
 	}

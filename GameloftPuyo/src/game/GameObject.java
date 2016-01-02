@@ -10,21 +10,36 @@ public class GameObject {
 	/**
 	 * color attribute which is 0 for any non-Puyo object
 	 */
-	protected int color=UNKNOWN;
+	protected int type=UNKNOWN_TYPE_MASK;
 	
-	public static int UNKNOWN = 0x00000000;
-	public static int RED = 0x00FF0000;
-	public static int GREEN = 0x0000FF00;
-	public static int BLUE = 0x000000FF;
-	public static int YELLOW = 0x00FFFF00;
+	public static final int UNKNOWN_TYPE_MASK = 0x00000000;
+	public static final int PUYO_TYPE_MASK = 0x01000000;
 	
 	public GameObject() {
 		//this.id = 
 		state = GameObjectState.UNKNOWN;
 	}
 	
-	public void setCoordinates(int column, int line) {
+	protected void setCoordinates(int column, int line) {
 		x = column; y = line*Options.FALL_ITERATIONS_COUNT;
+	}
+	
+	protected void drop() {
+		y++;
+		if (state.equals(GameObjectState.FALLING_FAST) && Options.FALL_ITERATIONS_COUNT>1)
+			setCoordinates(getColumn(), getLine()+1);
+	}
+	
+	protected int getFallIteration(){
+		return y;
+	}
+	
+	public int getX() {
+		return x*Options.CELL_WIDTH;
+	}
+	
+	public int getY() {
+		return y*Options.CELL_WIDTH/Options.FALL_ITERATIONS_COUNT;
 	}
 	
 	public int getColumn() {
@@ -32,18 +47,19 @@ public class GameObject {
 	}
 	
 	public int getLine() {
-		return y/Options.FALL_ITERATIONS_COUNT;
+		//return y/Options.FALL_ITERATIONS_COUNT;
+		return (int)Math.ceil((double)getFallIteration()/Options.FALL_ITERATIONS_COUNT);
 	}
 	
 	public GameObjectState getState() { 
 		return state;
 	}
 	
-	public void setState(GameObjectState state) {
+	protected void setState(GameObjectState state) {
 		this.state = state;
 	}
 	
-	public int getColor() {
-		return color;
+	public int getType() {
+		return type;
 	}
 }

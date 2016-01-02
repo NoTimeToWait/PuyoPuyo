@@ -6,11 +6,11 @@ import java.util.HashSet;
 
 public class PuyoChain {
 	private HashSet<Puyo> puyos;
-	private int color;
+	private int type;
 	
 	public PuyoChain(Puyo...puyoChain){
 		puyos = new HashSet<Puyo>();
-		color = puyoChain[0].getColor();
+		type = puyoChain[0].getType();
 		for (Puyo puyo:puyoChain) {
 			puyos.add(puyo);
 		}
@@ -18,7 +18,7 @@ public class PuyoChain {
 	
 	public PuyoChain(Collection<Puyo> puyoChain){
 		puyos = new HashSet<Puyo>();
-		color = puyoChain.iterator().next().getColor();
+		type = puyoChain.iterator().next().getType();
 		puyos.addAll(puyoChain);
 	}
 	
@@ -31,13 +31,13 @@ public class PuyoChain {
 	}
 	
 	public boolean merge(PuyoChain anotherChain) {
-		if (this.equals(anotherChain) || color!=anotherChain.getColor()) return false;
+		if (this.equals(anotherChain) || type!=anotherChain.getType()) return false;
 		puyos.addAll(anotherChain.puyos);
 		return true;
 	}
 	
-	public int getColor() {
-		return color;
+	public int getType() {
+		return type;
 	}
 	
 	public int size() {

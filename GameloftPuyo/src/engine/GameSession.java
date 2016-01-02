@@ -12,17 +12,31 @@ import java.util.ArrayList;
  *
  */
 public class GameSession {
+	//collision is improbable in single player mode
+	//TODO:in multiplayer mode is quite improbable, though this issue should be thoroughly considered
+	private static final long sessionId = System.currentTimeMillis();
 	
-	private long sessionId;
+	public static final long getSessionId() {
+		return sessionId;
+	}
 	
-	private ArrayList<Player> players = new ArrayList<Player>();
+	private ArrayList<NetworkPlayer> players = new ArrayList<NetworkPlayer>();
 	
-	public void addPlayer(Player player) {
+	public void addPlayer(NetworkPlayer player) {
 		players.add(player);
 	}
 	
-	public ArrayList<Player> getPlayers() {
+	public ArrayList<NetworkPlayer> getPlayers() {
 		return players;
+	}
+	
+	/**
+	 * check player permissions
+	 * @param player player, whose credentials are being verified
+	 * @return true if player is host
+	 */
+	public static boolean isHost(NetworkPlayer player) {
+		return true;
 	}
 
 }

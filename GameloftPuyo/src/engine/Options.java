@@ -4,14 +4,14 @@ public class Options {
 	/**
 	 * time in milliseconds between game ticks
 	 */
-	public static int GAME_TICK_TIME = 500; 
+	public static int GAME_TICK_TIME = 300; 
 	
 	public static final int GRAPHICS_UPDATE_DELAY = 100;
 	
 	/**
 	 *  number of steps it takes to drop puyo down from one field cell to another below
 	 */
-	public static int FALL_ITERATIONS_COUNT = 1;
+	public static int FALL_ITERATIONS_COUNT = 3;
 	
 	/**
 	 *  default game field dimensions
@@ -22,8 +22,11 @@ public class Options {
 	
 	
 	public static int NUMERIC_VERSION = 1;
-	public static int WINDOW_WIDTH = 192;
-	public static int WINDOW_HEIGHT = 384;
+	public static int WINDOW_WIDTH = 640;
+	public static int WINDOW_HEIGHT = 480;
+	
+	public static int FRAMERATE = 30;
+	
 	public static String LANGUAGE = "ENG";
 	
 	/**
@@ -33,5 +36,17 @@ public class Options {
 	public static Strings getStrings() {
 		//if (LANGUAGE.equals("RUS")) return new StringsRU();
 		return new Strings();
+	}
+	
+	public final static String[] imgLinks = new String[] {
+			"img/puyo_red.png",
+			"img/puyo_green.png",
+			"img/puyo_blue.png",
+			"img/puyo_yellow.png",
+			"img/unknown.png",
+	};
+	
+	public static String[] getImageLinks() {
+		return imgLinks;
 	}
 }
