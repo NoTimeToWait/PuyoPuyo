@@ -57,11 +57,12 @@ public class GameContext {
 	 * 
 	 * @return
 	 */
-	private GameSession getGameSession() {
+	public static GameSession getGameSession() {
 		//right now just returns a new object, 
-		//though this method should implement fetching a GameSession from the other player over the network
+		//though this method should implement fetching a GameSession from the host over the network
 		//when in multiplayer mode (currently not implemented)
-		return new GameSession();
+		if (gameSession==null) gameSession = new GameSession();
+		return gameSession;
 	}
 	
 	/**

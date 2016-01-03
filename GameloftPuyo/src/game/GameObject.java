@@ -1,5 +1,9 @@
 package game;
 
+import java.util.Random;
+
+import engine.GameContext;
+import engine.GameSession;
 import engine.Options;
 
 public class GameObject {
@@ -15,8 +19,10 @@ public class GameObject {
 	public static final int UNKNOWN_TYPE_MASK = 0x00000000;
 	public static final int PUYO_TYPE_MASK = 0x01000000;
 	
+	private static Random idGenerator = new Random(GameSession.getSessionId() + GameContext.getPlayer().hashCode());
+	
 	public GameObject() {
-		//this.id = 
+		this.id = idGenerator.nextInt();
 		state = GameObjectState.UNKNOWN;
 	}
 	
@@ -50,5 +56,21 @@ public class GameObject {
 	
 	public int getType() {
 		return type;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GameObject other = (GameObject) obj;
+		if (id!=other.id)	return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Integer.hashCode(id);
 	}
 }

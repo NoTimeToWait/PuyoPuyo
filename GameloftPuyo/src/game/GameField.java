@@ -2,6 +2,7 @@ package game;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import engine.Options;
 import engine.Player;
@@ -20,7 +21,7 @@ public class GameField {
 	 */
 	//private FieldCell[][] stagingArea; 
 	
-	private ArrayList<GameObject> gameObjects;
+	private HashSet<GameObject> gameObjects;
 	private ArrayList<Puyo> playerPuyo;
 	private ArrayList<Point> rotationPoints;
 	
@@ -39,7 +40,7 @@ public class GameField {
 			for (int j=0; j<height; j++)
 				cells[i][j] = new FieldCell();
 		playerPuyo = new ArrayList<Puyo>();
-		gameObjects = new ArrayList<GameObject>();
+		gameObjects = new HashSet<GameObject>();
 		rotationPoints = new ArrayList<Point>();
 		rotationPoints.add(new Point(1,0));
 		rotationPoints.add(new Point(0,1));
@@ -52,7 +53,7 @@ public class GameField {
 	/**
 	 * dispatch an event to the game field
 	 */
-	public boolean dispatchEvent(GameEvent event) {
+	public synchronized boolean dispatchEvent(GameEvent event) {
 		if (event.equals(GameEvent.USERINPUT_LEFT)) {
 			for (Puyo puyo:playerPuyo)
 				if (puyo.getColumn()-1<0
@@ -105,7 +106,7 @@ public class GameField {
 	/**
 	 * dispatch a new tick to the game field
 	 */
-	public boolean dispatchTick() {
+	public synchronized boolean dispatchTick() {
 		tickCount++;
 		if (chainCombo!=null && Math.abs(tickCount-chainCombo.tick)>2) {
 			player.updateScore(chainCombo.getScore());
@@ -133,7 +134,7 @@ public class GameField {
 		return tickCount;
 	}
 	
-	public GameObject[] getObjectsToDraw(boolean all) {
+	public synchronized GameObject[] getObjectsToDraw(boolean all) {
 		if (all) return gameObjects.toArray(new GameObject[0]);
 		ArrayList<GameObject> result = new ArrayList<GameObject>();
 		for (GameObject obj:gameObjects)
@@ -142,8 +143,6 @@ public class GameField {
 	}
 	
 	private void updateField() {
-		
-		
 		
 		//fixate objects
 		for (int j=height-1; j>=0; j--)

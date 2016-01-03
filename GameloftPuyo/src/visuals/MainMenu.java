@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import engine.GameContext;
+import engine.NetworkPlayer;
 import engine.Options;
 import engine.Player;
 import engine.Strings;
@@ -204,12 +205,13 @@ public class MainMenu extends JFrame{
 	
 	/**
 	 * update game pane UI
-	 * @param player the curr
+	 * 
 	 * @param drawAll
 	 */
 	public void updateUI(boolean drawAll) {
 		if (currentPane!=null && currentPane==gamePane) {
-			gamePane.drawObjects(GameContext.getPlayer().getGameObjects(drawAll));
+			for (NetworkPlayer player:GameContext.getGameSession().getPlayers())
+				gamePane.drawObjects(player);
 		}
 			
 	}
