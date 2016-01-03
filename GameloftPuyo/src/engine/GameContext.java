@@ -78,4 +78,8 @@ public class GameContext {
 		if (player==null) player = new Player();
 		return player;
 	}
+	
+	public static void updateMenu() {
+		menu.updateUI();
+	}
 }

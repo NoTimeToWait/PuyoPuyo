@@ -32,6 +32,7 @@ public class MainMenu extends JFrame{
 	private FieldView gamePane;
 	private JPanel currentPane;
 	private JButton continueBtn;
+	private long actionPerformed;
 	
 	
 	public MainMenu(String title) {
@@ -50,48 +51,28 @@ public class MainMenu extends JFrame{
 		menu.switchToMenuPane();
 		
 		mapKeybindings(((JPanel)menu.getContentPane()).getInputMap());
-		AbstractAction p1LeftAction = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Player player = GameContext.getPlayer();
-				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_LEFT);
-			}
-		};
-		AbstractAction p1RightAction = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Player player = GameContext.getPlayer();
-				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_RIGHT);
-			}
-		};
-		AbstractAction p1UpAction = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Player player = GameContext.getPlayer();
-				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_UP);
-			}
-		};
-		AbstractAction p1DownAction = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Player player = GameContext.getPlayer();
-				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_DOWN);
-			}
-		};
-		AbstractAction p1DownReleasedAction = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Player player = GameContext.getPlayer();
-				if (menu.currentPane==menu.gamePane) player.dispatchEvent(player, GameEvent.USERINPUT_DOWN_RELEASE);
-			}
-		};
+		
 		ActionMap actionMap = ((JPanel)menu.getContentPane()).getActionMap();
-		actionMap.put("p1_left", p1LeftAction);
-		actionMap.put("p1_right", p1RightAction);
-		actionMap.put("p1_up", p1UpAction);
-		actionMap.put("p1_down", p1DownAction);
-		actionMap.put("p1_down_released", p1DownReleasedAction);
+		actionMap.put("p1_left", getButtonAction(menu,  GameEvent.USERINPUT_LEFT, 0));
+		actionMap.put("p1_right", getButtonAction(menu,  GameEvent.USERINPUT_RIGHT, 0));
+		actionMap.put("p1_up", getButtonAction(menu,  GameEvent.USERINPUT_UP, 30));
+		actionMap.put("p1_down", getButtonAction(menu,  GameEvent.USERINPUT_DOWN, 0));
+		actionMap.put("p1_down_released", getButtonAction(menu,  GameEvent.USERINPUT_DOWN_RELEASE, 0));
 		return menu;
+	}
+	
+	private static AbstractAction getButtonAction(MainMenu menu, GameEvent event, int timeOffset) {
+		return new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Player player = GameContext.getPlayer();
+				if (menu.currentPane==menu.gamePane
+						&& System.currentTimeMillis()-menu.actionPerformed>=Options.GAME_TICK_TIME+timeOffset) { 
+					player.dispatchEvent(player, event);
+					menu.actionPerformed = System.currentTimeMillis();
+				}
+			}
+		};
 	}
 	
 	private static void mapKeybindings(InputMap inputMap) {

@@ -21,10 +21,22 @@ import game.Puyo;
 
 public class FieldView extends JPanel {
 	private GameObject[] drawObjects;
-	private ArrayList<Animation> animations;
+	private static ArrayList<Animation> animations;
 	public FieldView() {
 		super();
 		animations = new ArrayList<Animation>(); 
+	}
+	
+	public static void shift(GameObject obj) {
+		for (Animation anim:animations)
+			if (obj.equals(anim.object)) {
+				Animation newAnim = new TranslationY(obj, anim.animationLength);
+				newAnim.iteration = anim.iteration;
+				newAnim.listener = anim.listener;
+				animations.remove(anim);
+				animations.add(newAnim);
+				break;
+			}
 	}
 	
 	public void updateObjects(NetworkPlayer player) {

@@ -4,8 +4,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import engine.GameContext;
 import engine.Options;
 import engine.Player;
+import visuals.FieldView;
 
 public class GameField {
 	private Player player;
@@ -91,16 +93,22 @@ public class GameField {
 				playerPuyo.get(0).setCoordinates(col, line);
 				break;
 			}
-			
+			FieldView.shift(playerPuyo.get(0));
 		}
-		if (event.equals(GameEvent.USERINPUT_DOWN)) 
+		if (event.equals(GameEvent.USERINPUT_DOWN)) { 
 			for (Puyo puyo:playerPuyo)
 				puyo.setState(GameObjectState.FALLING_FAST);
-		
+		}
 		if (event.equals(GameEvent.USERINPUT_DOWN_RELEASE)) 
 			for (Puyo puyo:playerPuyo)
 				puyo.setState(GameObjectState.FALLING_SLOW);
-		
+		/*try {
+			wait(30);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		Thread.yield();
 		return true;
 	}
 	
@@ -113,7 +121,20 @@ public class GameField {
 			player.updateScore(chainCombo.getScore());
 			chainCombo=null;
 		}
+		
+		/*System.out.println();
+		for (Puyo puyo:playerPuyo)
+			System.out.print(" Line "+puyo.getLine() );
+		System.out.print(System.currentTimeMillis());*/
+		//playerPuyosAreFixed();
+		
 		boolean nextPlayerTuple = false;
+		/*if (!playerPuyo.isEmpty()) {
+			Puyo puyo = playerPuyo.get(0).getLine()>playerPuyo.get(1).getLine()? playerPuyo.get(0) : playerPuyo.get(1);
+			if (puyo.getLine()==height-1 || cells[puyo.getColumn()][puyo.getLine()+1].getState().isFixed())
+				nextPlayerTuple = true;
+		}*/
+		
 		for (Puyo puyo:playerPuyo)
 			if (puyo.getState().isFixed()) {
 				nextPlayerTuple = true; break;
@@ -122,10 +143,19 @@ public class GameField {
 			for (Puyo puyo:playerPuyo)
 				if (!puyo.getState().isFixed()) 
 					puyo.setState(GameObjectState.FALLING_FAST);
-		if (nextPlayerTuple || playerPuyo.isEmpty()) spawnPlayerTuple(0,0);
+		if (tickCount%Options.SLOW_DROP_TICKS==1 && (nextPlayerTuple || playerPuyo.isEmpty())) spawnPlayerTuple(0,0);
+		
 		updateField();
 		return true;
 	}
+	
+	/*private void playerPuyosAreFixed() {
+		if (playerPuyo.isEmpty()) return;
+		Puyo puyo = playerPuyo.get(0).getLine()>playerPuyo.get(1).getLine()? playerPuyo.get(0) : playerPuyo.get(1);
+		if (puyo.getLine()==height-1 || cells[puyo.getColumn()][puyo.getLine()+1].getState().isFixed())
+			for (Puyo p:playerPuyo)
+				p.setState(GameObjectState.FIXED);
+	}*/
 	
 	/**
 	 * get game tick count
