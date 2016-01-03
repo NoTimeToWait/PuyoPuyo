@@ -46,8 +46,6 @@ public class GameContext {
 			@Override
 				public void run() {
 				frameCount++;
-				//if (frameCount%Options.getFramesPerTick()==0)
-				//	menu.updateUI();
 				menu.repaintUI(true);
 			}
 		};

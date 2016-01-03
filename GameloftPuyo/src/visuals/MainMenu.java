@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,12 +34,13 @@ public class MainMenu extends JFrame{
 	private FieldView gamePane;
 	private JPanel currentPane;
 	private JButton continueBtn;
-	private long actionPerformed;
+	private SortedMap<String, Long> actionPerformedMap;
 	
 	
 	public MainMenu(String title) {
 		super(title);
 		currentPane = new JPanel();
+		actionPerformedMap = new TreeMap<String, Long>();
 	}
 	
 	public static MainMenu createView(GameContext gameContext, int width, int height, String title) {
@@ -53,23 +56,31 @@ public class MainMenu extends JFrame{
 		mapKeybindings(((JPanel)menu.getContentPane()).getInputMap());
 		
 		ActionMap actionMap = ((JPanel)menu.getContentPane()).getActionMap();
-		actionMap.put("p1_left", getButtonAction(menu,  GameEvent.USERINPUT_LEFT, 0));
-		actionMap.put("p1_right", getButtonAction(menu,  GameEvent.USERINPUT_RIGHT, 0));
-		actionMap.put("p1_up", getButtonAction(menu,  GameEvent.USERINPUT_UP, 30));
-		actionMap.put("p1_down", getButtonAction(menu,  GameEvent.USERINPUT_DOWN, 0));
-		actionMap.put("p1_down_released", getButtonAction(menu,  GameEvent.USERINPUT_DOWN_RELEASE, 0));
+		actionMap.put("p1_left", getButtonAction(menu,  GameEvent.USERINPUT_LEFT, 0, false));
+		actionMap.put("p1_right", getButtonAction(menu,  GameEvent.USERINPUT_RIGHT, 0, false));
+		actionMap.put("p1_up", getButtonAction(menu,  GameEvent.USERINPUT_UP, 30, false));
+		actionMap.put("p1_down", getButtonAction(menu,  GameEvent.USERINPUT_DOWN, 30, true));
+		actionMap.put("p1_down_released", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				menu.actionPerformedMap.put(GameEvent.USERINPUT_DOWN.toString(), -System.currentTimeMillis());
+			}	
+		});
 		return menu;
 	}
 	
-	private static AbstractAction getButtonAction(MainMenu menu, GameEvent event, int timeOffset) {
+	private static AbstractAction getButtonAction(MainMenu menu, GameEvent event, int timeOffset, boolean releaseRequired) {
 		return new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Player player = GameContext.getPlayer();
-				if (menu.currentPane==menu.gamePane
-						&& System.currentTimeMillis()-menu.actionPerformed>=Options.GAME_TICK_TIME+timeOffset) { 
+				long keyPressedTime=0;
+				if (menu.actionPerformedMap.containsKey(event.toString()))
+					keyPressedTime = menu.actionPerformedMap.get(event.toString());
+				boolean keyReleasedOrReady = releaseRequired? keyPressedTime<=0 : System.currentTimeMillis()-keyPressedTime>=Options.GAME_TICK_TIME+timeOffset;
+				if (menu.currentPane==menu.gamePane	&& keyReleasedOrReady) { 
 					player.dispatchEvent(player, event);
-					menu.actionPerformed = System.currentTimeMillis();
+					menu.actionPerformedMap.put(event.toString(), System.currentTimeMillis());
 				}
 			}
 		};
