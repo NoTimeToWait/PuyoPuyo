@@ -176,6 +176,7 @@ public class MainMenu extends JFrame{
 			gamePane.setPreferredSize(new Dimension(Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH));
 			//this.setBackground(Color.BLUE);
 			gamePane.setBackground(Color.WHITE);
+			
 		}
 		currentPane.setVisible(false);
 		this.getContentPane().remove(currentPane);
@@ -208,11 +209,15 @@ public class MainMenu extends JFrame{
 	 * 
 	 * @param drawAll
 	 */
-	public void updateUI(boolean drawAll) {
-		if (currentPane!=null && currentPane==gamePane) {
-			for (NetworkPlayer player:GameContext.getGameSession().getPlayers())
-				gamePane.drawObjects(player);
-		}
+	public void updateUI() {
+		for (NetworkPlayer player:GameContext.getGameSession().getPlayers()) 
+			gamePane.updateObjects(player);
+	}
+	
+	public void repaintUI(boolean drawAll) {
+		if (currentPane!=null && currentPane==gamePane) 
+				gamePane.repaint(); //.drawObjects(player);
+		
 			
 	}
 }

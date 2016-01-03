@@ -12,7 +12,7 @@ public class GameObject {
 	protected int x;
 	protected int y;
 	/**
-	 * color attribute which is 0 for any non-Puyo object
+	 * type attribute which is 0 for any non-Puyo object
 	 */
 	protected int type=UNKNOWN_TYPE_MASK;
 	

@@ -6,18 +6,20 @@ public class Options {
 	/**
 	 * time in milliseconds between game ticks
 	 */
-	public static int GAME_TICK_TIME = 150; 
+	public static int GAME_TICK_TIME = 1000; 
 	
 	public static final int GRAPHICS_UPDATE_DELAY = 100;
 	
 	/**
 	 *  number of steps it takes to drop puyo down from one field cell to another below
 	 */
-	public static int ANIMATION_ITERATIONS = 3;
+	public static int ANIMATION_ITERATIONS = 16;
 	
 	public static int getFramesPerTick() {
-		return Math.min(ANIMATION_ITERATIONS,  GAME_TICK_TIME*FRAMERATE/1000);
+		return ANIMATION_ITERATIONS;//return Math.min(ANIMATION_ITERATIONS,  GAME_TICK_TIME*FRAMERATE/1000);
 	}
+	
+	public static int SLOW_DROP_TICKS = 3;
 	
 	/**
 	 *  default game field dimensions

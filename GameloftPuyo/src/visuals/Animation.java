@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 
+import engine.NetworkPlayer;
 import engine.Options;
 import game.GameObject;
 import game.Puyo;
@@ -14,6 +15,7 @@ public class Animation {
 	protected GameObject object;
 	protected int animationLength;
 	protected int iteration;
+	protected boolean isFinished = false;
 	//protected int startTick;
 	protected AnimationListener listener;
 	
@@ -37,13 +39,19 @@ public class Animation {
 	
 	
 	public void animate(Graphics graphics, ImageObserver imgObs) {
-		if (animationLength*Options.getFramesPerTick()<=iteration && listener!=null)
-			listener.onAnimationEnd();
-		drawObject(graphics, imgObs);
 		iteration++;
+		//if (animationLength*Options.getFramesPerTick()<=iteration)
+		//	isFinished = true;
+		if (animationLength*Options.getFramesPerTick()<=iteration && listener!=null) {
+			isFinished = true;
+			listener.onAnimationEnd();
+		}
+		drawObject(graphics, imgObs);
+		
 	}
 	
 	protected void drawObject(Graphics g, ImageObserver imgObs) {
+		if (object==null) return;
 		switch (object.getType()) {
 		case Puyo.RED|GameObject.PUYO_TYPE_MASK: 
 			g.drawImage(images[0], getDrawX(), getDrawY(), imgObs); break;
@@ -54,7 +62,7 @@ public class Animation {
 		case Puyo.YELLOW|GameObject.PUYO_TYPE_MASK: 
 			g.drawImage(images[3], getDrawX(), getDrawY(), imgObs); break;
 		default: g.drawImage(images[4], getDrawX(), getDrawY(), imgObs);
-	};
+		};
 	}
 	
 	protected int getDrawX() {
@@ -65,20 +73,19 @@ public class Animation {
 		return object.getDrawY();
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Animation other = (Animation) obj;
-		if (!object.equals(other.object))	return false;
-		return true;
+	public static Animation getUpdateCounter(NetworkPlayer player, FieldView fieldView) {
+		Animation result = new Animation(null, 1);
+		result.setAnimationListener(getUpdateAnimationsListener(player, fieldView));
+		return result;
 	}
-
-	@Override
-	public int hashCode() {
-		return Integer.hashCode(37*object.hashCode());
+	
+	public static AnimationListener getUpdateAnimationsListener(NetworkPlayer player, FieldView fieldView) {
+		return new AnimationListener(){
+			@Override
+			public void onAnimationEnd() {
+				fieldView.updateObjects(player);
+			}
+		};
 	}
 
 }

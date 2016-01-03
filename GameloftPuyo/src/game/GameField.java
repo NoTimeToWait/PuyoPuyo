@@ -11,7 +11,7 @@ public class GameField {
 	private Player player;
 	private int width;
 	private int height;
-	private int tickCount;
+	public static int tickCount;
 	/**
 	 * game field represented as an array of cells
 	 */
@@ -57,7 +57,7 @@ public class GameField {
 		if (event.equals(GameEvent.USERINPUT_LEFT)) {
 			for (Puyo puyo:playerPuyo)
 				if (puyo.getColumn()-1<0
-					|| !(cells[puyo.getColumn()-1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()-1][puyo.getLine()])))
+					|| !(cells[puyo.getColumn()-1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()-1][puyo.getLine()].gameObject)))
 						return false;
 			for (Puyo puyo:playerPuyo) cells[puyo.getColumn()][puyo.getLine()].release();
 			for (Puyo puyo:playerPuyo) {
@@ -68,7 +68,7 @@ public class GameField {
 		if (event.equals(GameEvent.USERINPUT_RIGHT)) {
 			for (Puyo puyo:playerPuyo)
 				if (puyo.getColumn()+1>=width
-					|| !(cells[puyo.getColumn()+1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()+1][puyo.getLine()])))
+					|| !(cells[puyo.getColumn()+1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()+1][puyo.getLine()].gameObject)))
 						return false;
 			for (Puyo puyo:playerPuyo) cells[puyo.getColumn()][puyo.getLine()].release();
 			for (Puyo puyo:playerPuyo) {
@@ -112,7 +112,6 @@ public class GameField {
 			player.updateScore(chainCombo.getScore());
 			chainCombo=null;
 		}
-		updateField();
 		boolean nextPlayerTuple = false;
 		for (Puyo puyo:playerPuyo)
 			if (puyo.getState().isFixed()) {
@@ -123,6 +122,7 @@ public class GameField {
 				if (!puyo.getState().isFixed()) 
 					puyo.setState(GameObjectState.FALLING_FAST);
 		if (nextPlayerTuple || playerPuyo.isEmpty()) spawnPlayerTuple(0,0);
+		updateField();
 		return true;
 	}
 	
@@ -234,7 +234,7 @@ public class GameField {
 	private boolean drop(GameObject obj) {
 		if (!obj.getState().isFalling()) return false;
 		//slow drop is 3 times slower 
-		if (obj.getState().equals(GameObjectState.FALLING_SLOW)&&tickCount%3!=0) return false;
+		if (obj.getState().equals(GameObjectState.FALLING_SLOW)&&tickCount%Options.SLOW_DROP_TICKS!=0) return false;
 		if (cells[obj.getColumn()][obj.getLine()+1].fill(obj, obj.getColumn(), obj.getLine()+1)) {
 			cells[obj.getColumn()][obj.getLine()].release();
 			obj.setCoordinates(obj.getColumn(), obj.getLine()+1);
@@ -317,6 +317,7 @@ public class GameField {
 		public boolean fixate(){
 			//if last fall iteration of last cell row
 			if (isEmpty()) return false;
+			if (getState().equals(GameObjectState.FALLING_SLOW)&&tickCount%Options.SLOW_DROP_TICKS!=0) return false;
 			gameObject.setState(GameObjectState.FIXED);
 			//System.out.println("Fixate"+Integer.toHexString(gameObject.getType()));
 			return true;

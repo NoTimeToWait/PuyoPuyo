@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JPanel;
 
+import engine.GameContext;
 import engine.NetworkPlayer;
 import engine.Options;
 import game.GameField;
@@ -23,20 +24,32 @@ public class FieldView extends JPanel {
 	private ArrayList<Animation> animations;
 	public FieldView() {
 		super();
-		
+		animations = new ArrayList<Animation>(); 
 	}
 	
 	public void updateObjects(NetworkPlayer player) {
-		List<GameObject> updatedObjects = Arrays.asList(player.getGameObjects(true));
-		List<GameObject> objects = Arrays.asList(drawObjects);
-		for (GameObject obj:updatedObjects) {
-			int index = objects.indexOf(obj);
-			if (index>-1 && obj.getLine()!=objects.get(index).getLine()) {
-				//Animation anim = Animation.
-				//if ()
-			}
+		ArrayList<Animation> newAnimations = new ArrayList<Animation>();
+		b1: for (GameObject obj:player.getGameObjects(true)) {
+			if (obj.getState().equals(GameObjectState.FALLING_SLOW)) {
+				for (Animation anim:animations)
+					if (!anim.isFinished && obj.equals(anim.object)) {
+						newAnimations.add(anim);
+						System.out.println(GameField.tickCount);
+						continue b1;
+					}
+				if (GameField.tickCount<2) newAnimations.add(new Animation(obj, 1));
+				else
+					newAnimations.add(new TranslationY(obj, Options.SLOW_DROP_TICKS));
+			} else if (obj.getState().equals(GameObjectState.FALLING_FAST)) {
+				newAnimations.add(new TranslationY(obj, 1));
+			} else newAnimations.add(new Animation(obj, 1));
 		}
+		//newAnimations.add(Animation.getUpdateCounter(player, this));
+		animations = newAnimations;
+		//System.out.println("Updated animations:"+animations.size());
 	}
+		
+	
 	
 	public void drawObjects(NetworkPlayer player) {
 		/*List<GameObject> newObjects = Arrays.asList(player.getGameObjects(true));
@@ -65,9 +78,13 @@ public class FieldView extends JPanel {
 	
 	public void paint(Graphics g)
 	{
-		Image[] images = Animation.images;
-		if (drawObjects==null) return;
 		g.clearRect(0, 0, getWidth(), getHeight());
+		for (Animation anim:animations)
+			anim.animate(g, this);
+		
+		Image[] images = Animation.images;
+		drawObjects = GameContext.getPlayer().getGameObjects(true);
+		if (drawObjects==null) return;
 		if ( GameField.cells!=null)
 		for (int i=0; i<6; i++)
 			for (int j=0; j<12; j++) {
@@ -85,6 +102,8 @@ public class FieldView extends JPanel {
 				default: g.drawImage(images[4],200+i*32, j*32, this);
 			};
 			}
+			
+		/*
 		for (GameObject obj:drawObjects) 
 			switch (obj.getType()) {
 				case Puyo.RED|GameObject.PUYO_TYPE_MASK: 
@@ -97,6 +116,6 @@ public class FieldView extends JPanel {
 					g.drawImage(images[3],obj.getDrawX(), obj.getDrawY(), this); break;
 				default: g.drawImage(images[4],obj.getDrawX(), obj.getDrawY(), this);
 			};
-		drawObjects = null;
+		drawObjects = null;*/
 	}
 }
