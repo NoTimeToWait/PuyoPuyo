@@ -58,7 +58,7 @@ public class MainMenu extends JFrame{
 		ActionMap actionMap = ((JPanel)menu.getContentPane()).getActionMap();
 		actionMap.put("p1_left", getButtonAction(menu,  GameEvent.USERINPUT_LEFT, 0, false));
 		actionMap.put("p1_right", getButtonAction(menu,  GameEvent.USERINPUT_RIGHT, 0, false));
-		actionMap.put("p1_up", getButtonAction(menu,  GameEvent.USERINPUT_UP, 30, false));
+		actionMap.put("p1_up", getButtonAction(menu,  GameEvent.USERINPUT_UP, Options.GAME_TICK_TIME/6+30, false));
 		actionMap.put("p1_down", getButtonAction(menu,  GameEvent.USERINPUT_DOWN, 30, true));
 		actionMap.put("p1_down_released", new AbstractAction() {
 			@Override

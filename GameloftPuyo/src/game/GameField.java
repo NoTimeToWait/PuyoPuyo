@@ -57,6 +57,9 @@ public class GameField {
 	 * dispatch an event to the game field
 	 */
 	public synchronized boolean dispatchEvent(GameEvent event) {
+		if (playerPuyo.isEmpty()) return false;
+		for (Puyo puyo:playerPuyo)
+			if (puyo.getState().isFixed()) return false;
 		if (event.equals(GameEvent.USERINPUT_LEFT)) {
 			for (Puyo puyo:playerPuyo)
 				if (puyo.getColumn()-1<0

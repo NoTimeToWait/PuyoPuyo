@@ -8,10 +8,8 @@ public class Options {
 	 */
 	public static int GAME_TICK_TIME = 250; 
 	
-	//public static final int GRAPHICS_UPDATE_DELAY = 100;
-	
 	/**
-	 *  number of steps it takes to drop puyo down from one field cell to another below
+	 *  number of steps it takes to animate drop down from one field cell to another below
 	 */
 	public static int ANIMATION_ITERATIONS = 16;
 	
