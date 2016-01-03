@@ -40,8 +40,8 @@ public class Animation {
 	
 	public void animate(Graphics graphics, ImageObserver imgObs) {
 		iteration++;
-		//if (animationLength*Options.getFramesPerTick()<=iteration)
-		//	isFinished = true;
+		if (animationLength*Options.getFramesPerTick()<=iteration)
+			isFinished = true;
 		if (animationLength*Options.getFramesPerTick()<=iteration && listener!=null) {
 			isFinished = true;
 			listener.onAnimationEnd();

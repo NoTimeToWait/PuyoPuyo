@@ -29,7 +29,7 @@ public class GameContext {
 		gameSession = getGameSession();
 		player.setReady();
 		gameSession.addPlayer(player);
-		/*if (gameSession.isHost(player)) {
+		if (gameSession.isHost(player)) {
 			TimerTask tickDispatchTask = new TimerTask() {
 				@Override
 				public void run() {
@@ -40,21 +40,18 @@ public class GameContext {
 				}
 			};
 			gameTimer.schedule(tickDispatchTask, Options.GAME_TICK_TIME, Options.GAME_TICK_TIME);
-		}*/
+		}
 		TimerTask uiUdateTask = new TimerTask() {
 			int frameCount=0;
 			@Override
 				public void run() {
 				frameCount++;
-				if (frameCount%Options.getFramesPerTick()==0) {
-					for (NetworkPlayer player:gameSession.getPlayers())
-					player.dispatchTick(GameContext.this.player);
-					menu.updateUI();
-				}
+				//if (frameCount%Options.getFramesPerTick()==0)
+				//	menu.updateUI();
 				menu.repaintUI(true);
 			}
 		};
-		uiTimer.schedule(uiUdateTask, Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
+		uiTimer.scheduleAtFixedRate(uiUdateTask, Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
 	}
 
 	public void continueGame() {

@@ -34,12 +34,10 @@ public class FieldView extends JPanel {
 				for (Animation anim:animations)
 					if (!anim.isFinished && obj.equals(anim.object)) {
 						newAnimations.add(anim);
-						System.out.println(GameField.tickCount);
 						continue b1;
 					}
-				if (GameField.tickCount<2) newAnimations.add(new Animation(obj, 1));
-				else
-					newAnimations.add(new TranslationY(obj, Options.SLOW_DROP_TICKS));
+				if (GameField.tickCount>2) newAnimations.add(new TranslationY(obj, Options.SLOW_DROP_TICKS));
+				else newAnimations.add(new Animation(obj, 1));
 			} else if (obj.getState().equals(GameObjectState.FALLING_FAST)) {
 				newAnimations.add(new TranslationY(obj, 1));
 			} else newAnimations.add(new Animation(obj, 1));
