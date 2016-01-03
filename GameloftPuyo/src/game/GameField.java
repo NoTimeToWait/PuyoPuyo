@@ -12,6 +12,7 @@ public class GameField {
 	private int width;
 	private int height;
 	public static int tickCount;
+	public static int spawnTick;
 	/**
 	 * game field represented as an array of cells
 	 */
@@ -275,8 +276,10 @@ public class GameField {
 		playerPuyo.add(color1==0? new Puyo() : new Puyo(color1));
 		if (spawn(playerPuyo.get(0), width/2, 0, true)) {
 			playerPuyo.add(color2==0? new Puyo() : new Puyo(color2));
-				if (spawn(playerPuyo.get(1), width/2, 1, true))
+				if (spawn(playerPuyo.get(1), width/2, 1, true)) {
+					spawnTick = tickCount;
 					return true;
+				}
 				else release(playerPuyo.get(0));
 		}
 		playerPuyo = new ArrayList<Puyo>();

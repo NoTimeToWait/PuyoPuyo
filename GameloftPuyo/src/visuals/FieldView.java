@@ -36,7 +36,7 @@ public class FieldView extends JPanel {
 						newAnimations.add(anim);
 						continue b1;
 					}
-				if (GameField.tickCount>2) newAnimations.add(new TranslationY(obj, Options.SLOW_DROP_TICKS));
+				if (GameField.tickCount>GameField.spawnTick+1) newAnimations.add(new TranslationY(obj, Options.SLOW_DROP_TICKS));
 				else newAnimations.add(new Animation(obj, 1));
 			} else if (obj.getState().equals(GameObjectState.FALLING_FAST)) {
 				newAnimations.add(new TranslationY(obj, 1));

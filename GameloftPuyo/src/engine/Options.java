@@ -6,9 +6,9 @@ public class Options {
 	/**
 	 * time in milliseconds between game ticks
 	 */
-	public static int GAME_TICK_TIME = 1000; 
+	public static int GAME_TICK_TIME = 250; 
 	
-	public static final int GRAPHICS_UPDATE_DELAY = 100;
+	//public static final int GRAPHICS_UPDATE_DELAY = 100;
 	
 	/**
 	 *  number of steps it takes to drop puyo down from one field cell to another below
