@@ -191,15 +191,18 @@ public class FieldView extends JPanel {
 			public void paint(Graphics g)
 			{
 				g.setColor(Color.GRAY);
-				if (scorePane==null) {
-					g.clearRect(0, 0, this.getWidth(), this.getHeight());
-				}
+				//if (scorePane==null) {
+				//	g.clearRect(0, 0, this.getWidth(), this.getHeight());
+				//}
 				int marginX = this.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
 				int marginY = Animation.MARGIN;
 				g.fillRect(0, 0, Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
 				for (Animation anim:animations)
 					anim.animate(g, this);
+				if(chainCombo>1)
+					g.drawImage(getChainComboImage(Options.getStrings().getChainComboString()+" x"+chainCombo), 0, 0, this);
 				
+			    
 				/*BufferedImage message = getGraphicsConfiguration().createCompatibleImage(300, 100);
 				Graphics g2 = message.createGraphics();
 				g2.setColor(Color.GRAY);
