@@ -44,6 +44,10 @@ public class PuyoChain {
 		return puyos.size();
 	}
 	
+	public int score() {
+		return puyos.size()*250;
+	}
+	
 	public Collection<Puyo> getChain() {
 		return puyos;
 	}

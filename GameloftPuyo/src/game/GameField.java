@@ -85,8 +85,8 @@ public class GameField {
 			}
 		}
 		if (event.equals(GameEvent.USERINPUT_UP)) {
-			int difX = playerPuyo.get(1).getColumn()-playerPuyo.get(0).getColumn();
-			int difY = playerPuyo.get(1).getLine()-playerPuyo.get(0).getLine();
+			int difX = playerPuyo.get(0).getColumn()-playerPuyo.get(1).getColumn();
+			int difY = playerPuyo.get(0).getLine()-playerPuyo.get(1).getLine();
 			int index = rotationPoints.indexOf(new Point(difX, difY));
 			for (int i=0; i<4; i++) {
 				Point rotationPoint = rotationPoints.get((index+1+i)%rotationPoints.size());
@@ -114,6 +114,7 @@ public class GameField {
 		tickCount++;
 		if (chainCombo!=null && Math.abs(tickCount-chainCombo.tick)>2) {
 			player.updateScore(chainCombo.getScore());
+			FieldView.chainCombo(0);
 			chainCombo=null;
 		}
 		boolean nextPlayerTuple = false;
@@ -177,7 +178,10 @@ public class GameField {
 			if (chain.size()>3) {
 				released = true;
 				if (chainCombo==null) chainCombo = new ChainCombo(chain, tickCount);
-				else chainCombo.add(chain);
+				else {
+					chainCombo.add(chain);
+					FieldView.chainCombo(chainCombo.size());
+				}
 				for (Puyo puyo:chain.getChain()) 
 					release(puyo);
 			}

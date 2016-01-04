@@ -6,7 +6,7 @@ public class Options {
 	/**
 	 * time in milliseconds between game ticks
 	 */
-	public static int GAME_TICK_TIME = 150; 
+	public static int GAME_TICK_TIME = 250; 
 	
 	/**
 	 *  number of steps it takes to animate drop down from one field cell to another below

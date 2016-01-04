@@ -1,11 +1,21 @@
 package visuals;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.Toolkit;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +44,8 @@ public class FieldView extends JPanel {
 	private static JPanel scorePane;
 	private static JPanel fieldPane;
 	private static JPanel nextPane;
+	private static int chainCombo = 0;
+	private BufferedImage comboImage;
 	
 	public FieldView() {
 		super();
@@ -126,14 +138,52 @@ public class FieldView extends JPanel {
 		repaint();
 	}*/
 	
+	public static void chainCombo(int comboCount) {
+		//score.setText(Options.getStrings().getChainComboString()+" x"+comboCount);
+		//scorePane.repaint();
+		chainCombo = comboCount;
+		
+	}
+	
 	public void paint(Graphics g) {
 		fieldPane.repaint();
+		
 	}
 	
 	public static void repaintAdditionalInfo() {
 		scorePane.repaint();
 		nextPane.repaint();
 		score.setText(Options.getStrings().getScoreLblText()+":"+GameContext.getPlayer().getScore());
+	}
+	
+	private BufferedImage getChainComboImage(String str) {
+		if (comboImage==null) {
+			comboImage = getGraphicsConfiguration().createCompatibleImage(300, 100);
+			Graphics g2 = comboImage.createGraphics();
+			Font font = getFont();
+            setFont(font.deriveFont(Font.PLAIN, 20));
+			Graphics2D g2d = (Graphics2D)g2.create();
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+	        FontRenderContext frc = g2d.getFontRenderContext();
+	        String s = "CHAIN COMBO";
+	        TextLayout textTl = new TextLayout(s, getFont(), frc);
+	        Shape outline = textTl.getOutline(null);
+
+	        FontMetrics fm = g2d.getFontMetrics(getFont());
+	        int x = 30;//(getWidth() - outline.getBounds().width) / 2;
+	        int y = 30;//((getHeight() - outline.getBounds().height) / 2) + fm.getAscent();
+	        g2d.translate(x, y);
+
+	        Stroke stroke = g2d.getStroke();
+	        g2d.setColor(Color.BLACK);
+	        g2d.fill(outline);
+	        g2d.setStroke(new BasicStroke(3));
+	        g2d.setColor(Color.RED);
+	        g2d.draw(outline);
+	        g2d.dispose();
+		}
+		return comboImage;
 	}
 	
 	private JPanel getFieldPane() {
@@ -150,6 +200,19 @@ public class FieldView extends JPanel {
 				for (Animation anim:animations)
 					anim.animate(g, this);
 				
+				/*BufferedImage message = getGraphicsConfiguration().createCompatibleImage(300, 100);
+				Graphics g2 = message.createGraphics();
+				g2.setColor(Color.GRAY);
+				g2.fillRect(0, 0, 300, 100);
+				g2.setColor(Color.RED);
+				g2.drawImage(Animation.images[0], 0, 0, this);
+				//g2.drawChars("111".toCharArray(), 0, 3, 0, 0);
+				//g2.drawRect(0, 0, 100, 100);
+				 Graphics2D g2d = (Graphics2D)g;
+			     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				   
+				g2d.drawString(Options.getStrings().getChainComboString()+" x"+chainCombo, 0, 0);
+				g.drawImage(message, 0, 0, this);*/
 				
 				
 				/*Image[] images = Animation.images;

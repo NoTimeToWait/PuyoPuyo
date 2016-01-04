@@ -12,6 +12,7 @@ public class Strings {
 	protected String APPLY_BTN_TEXT = "APPLY";
 	protected String SCORE_LBL_TEXT = "SCORE";
 	protected String DEFAULT_PLAYER_NAME = "PLAYER";
+	protected String CHAIN_COMBO_STRING = "CHAIN COMBO";
 	
 	public String getTitle() { return TITLE;}
 	public String getVersion() { return VERSION;}
@@ -24,6 +25,7 @@ public class Strings {
 	public String getApplyBtnText() {return APPLY_BTN_TEXT;}
 	public String getScoreLblText() {return SCORE_LBL_TEXT;}
  	public String getDefaultPlayerName() {return DEFAULT_PLAYER_NAME;}
+ 	public String getChainComboString() {return CHAIN_COMBO_STRING;}
 	
 }
 

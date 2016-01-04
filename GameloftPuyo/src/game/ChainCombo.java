@@ -21,7 +21,14 @@ public class ChainCombo {
 	}
 	
 	public int getScore() {
-		return chains.size()*1000;
+		int score=0;
+		for (PuyoChain chain:chains) 
+			score+=chain.score();
+		return chains.size()*score;
+	}
+	
+	public int size() {
+		return chains.size();
 	}
 	
 }
