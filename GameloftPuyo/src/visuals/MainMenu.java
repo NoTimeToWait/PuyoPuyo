@@ -48,7 +48,6 @@ public class MainMenu extends JFrame{
 		menu.setSize(width, height);
 		menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		menu.gameContext = gameContext;
-		menu.setBackground(Color.WHITE);
 		menu.getContentPane().add(new JPanel(), BorderLayout.WEST);
 		menu.getContentPane().add(new JPanel(), BorderLayout.EAST);
 		menu.switchToMenuPane();

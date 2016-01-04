@@ -3,6 +3,7 @@ package engine;
 import game.GameEvent;
 import game.GameField;
 import game.GameObject;
+import visuals.FieldView;
 
 public class Player implements NetworkPlayer {
 	

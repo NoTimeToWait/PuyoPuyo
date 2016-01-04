@@ -31,9 +31,9 @@ public class FieldView extends JPanel {
 	private GameObject[] drawObjects;
 	private static ArrayList<Animation> animations;
 	private static JLabel score;
-	private JPanel scorePane;
-	private JPanel fieldPane;
-	private JPanel nextPane;
+	private static JPanel scorePane;
+	private static JPanel fieldPane;
+	private static JPanel nextPane;
 	
 	public FieldView() {
 		super();
@@ -47,7 +47,7 @@ public class FieldView extends JPanel {
 		
 		scorePane = new JPanel();
 		//scorePane.setPreferredSize(new Dimension(Options.CELL_WIDTH*(Options.DEFAULT_FIELD_WIDTH+1), 32));
-		score = new JLabel("SCORE");
+		score = new JLabel(Options.getStrings().getScoreLblText()+":");
 		score.setPreferredSize(new Dimension(Options.CELL_WIDTH*(Options.DEFAULT_FIELD_WIDTH+2), 18));
 		//score.setPreferredSize(new Dimension(174, 18));
 		score.setHorizontalAlignment(JLabel.LEFT);
@@ -57,10 +57,18 @@ public class FieldView extends JPanel {
 		scorePane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		scorePane.add(score);
 		
-		nextPane = new JPanel();
+		nextPane = new JPanel(){
+			public void paint(Graphics g) {
+				super.paint(g);
+				int[] puyos = GameContext.getPlayer().getPuyos();
+				//g.clearRect(0, 0, nextPane.getWidth(), nextPane.getHeight());
+				for (int i=0; i<puyos.length; i++)
+					Animation.drawObject(g, fieldPane, puyos[i], 18, 24+i*Options.CELL_WIDTH);
+			}
+		};
 		nextPane.setPreferredSize(new Dimension(Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT));
 		//nextPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		JLabel nextLabel = new JLabel("NEXT:");
+		JLabel nextLabel = new JLabel(Options.getStrings().getNextBtnText()+":");
 		nextLabel.setVerticalAlignment(JLabel.TOP);
 		nextLabel.setPreferredSize(new Dimension(Options.CELL_WIDTH*2, Options.CELL_WIDTH*3));
 		nextLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -71,11 +79,11 @@ public class FieldView extends JPanel {
 		northPane.add(Box.createHorizontalGlue());
 		northPane.add(scorePane);
 		northPane.add(Box.createHorizontalGlue());
-		JPanel eastPane = new JPanel();
-		eastPane.add(fieldPane);
-		eastPane.add(nextPane);
+		JPanel centerPane = new JPanel();
+		centerPane.add(fieldPane);
+		centerPane.add(nextPane);
 		this.add(northPane, BorderLayout.NORTH);
-		this.add(eastPane, BorderLayout.CENTER);
+		this.add(centerPane, BorderLayout.CENTER);
 	}
 	
 	public static void shift(GameObject obj) {
@@ -111,36 +119,21 @@ public class FieldView extends JPanel {
 	}
 		
 	
-	
+	/*
 	public void drawObjects(NetworkPlayer player) {
-		/*List<GameObject> newObjects = Arrays.asList(player.getGameObjects(true));
-		List<GameObject> objects = Arrays.asList(drawObjects);
-		ArrayList<GameObject> animateObjectsList = new ArrayList<GameObject>(Arrays.asList(drawObjects));
-		animateObjectsList.retainAll(objects);
-		for (GameObject obj:objects) {
-			int index = newObjects.indexOf(obj);
-			if (index>-1 && obj.getLine()!=newObjects.get(index).getLine()) {
-				//Animation anim = Animation.
-				//if ()
-			}
-		}
-		for (GameObject obj:player.getGameObjects(true)) {
-			Animation anim = new Animation(obj, 1);
-			if (!animations.contains(anim)) {
-				if (obj.getState().equals(GameObjectState.FALLING_SLOW))
-					anim = new TranslationY
-			}
-		}*/
-			
+					
 		drawObjects = player.getGameObjects(true);
 		repaint();
-	}
+	}*/
 	
 	public void paint(Graphics g) {
 		fieldPane.repaint();
+	}
+	
+	public static void repaintAdditionalInfo() {
 		scorePane.repaint();
 		nextPane.repaint();
-		score.setText(Options.getStrings().getScoreLblText()+" "+GameContext.getPlayer().getScore());
+		score.setText(Options.getStrings().getScoreLblText()+":"+GameContext.getPlayer().getScore());
 	}
 	
 	private JPanel getFieldPane() {
@@ -157,7 +150,9 @@ public class FieldView extends JPanel {
 				for (Animation anim:animations)
 					anim.animate(g, this);
 				
-				Image[] images = Animation.images;
+				
+				
+				/*Image[] images = Animation.images;
 				drawObjects = GameContext.getPlayer().getGameObjects(true);
 				if (drawObjects==null) return;
 				if ( GameField.cells!=null)

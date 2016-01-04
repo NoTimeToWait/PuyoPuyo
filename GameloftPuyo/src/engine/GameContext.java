@@ -3,6 +3,7 @@ package engine;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import visuals.FieldView;
 import visuals.MainMenu;
 
 public class GameContext {
@@ -46,6 +47,7 @@ public class GameContext {
 					for (NetworkPlayer player:gameSession.getPlayers())
 						player.dispatchTick(GameContext.this.player);
 					menu.updateUI();
+					FieldView.repaintAdditionalInfo();
 				}
 			};
 			gameTimer.schedule(tickDispatchTask, Options.GAME_TICK_TIME, Options.GAME_TICK_TIME);

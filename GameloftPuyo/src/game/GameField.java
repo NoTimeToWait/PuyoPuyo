@@ -18,7 +18,7 @@ public class GameField {
 	/**
 	 * game field represented as an array of cells
 	 */
-	public static FieldCell[][] cells;
+	private static FieldCell[][] cells;
 	/**
 	 * area where all puyos are prepared to drop onto the game field
 	 */
@@ -298,7 +298,7 @@ public class GameField {
 		playerPuyo = new ArrayList<Puyo>();
 	}
 	
-	public int[] getNextTuple() {
+	public synchronized int[] getNextTuple() {
 		int[] result = new int[nextTuple.size()];
 		for (int i=0; i<nextTuple.size(); i++)
 			result[i] = nextTuple.get(i).getType();
@@ -309,7 +309,7 @@ public class GameField {
 		/**
 		 * gameObject game object in this cell
 		 */
-		public GameObject gameObject;
+		private GameObject gameObject;
 		/**
 		 * check whether this cell contains any game object
 		 * @return true if cell is empty

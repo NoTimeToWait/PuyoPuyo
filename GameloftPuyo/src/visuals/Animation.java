@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import engine.NetworkPlayer;
@@ -53,7 +54,7 @@ public class Animation {
 		
 	}
 	
-	protected static void drawObject(Graphics g, JPanel pane, int type, int x, int y) {
+	protected static void drawObject(Graphics g, JComponent pane, int type, int x, int y) {
 		int marginX = pane.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
 		int marginY = MARGIN;
 		switch (type) {

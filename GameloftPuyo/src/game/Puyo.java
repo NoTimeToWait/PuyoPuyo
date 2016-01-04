@@ -21,7 +21,6 @@ public class Puyo extends GameObject{
 	public Puyo() {
 		super();
 		this.type = colors[colorRandomizer.nextInt(Integer.MAX_VALUE)%colors.length] | GameObject.PUYO_TYPE_MASK;
-		System.out.println(Integer.toHexString(type));
 	}
 	
 	public Puyo(int color) {
