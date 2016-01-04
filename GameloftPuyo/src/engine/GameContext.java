@@ -3,6 +3,8 @@ package engine;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JOptionPane;
+
 import visuals.FieldView;
 import visuals.MainMenu;
 
@@ -13,14 +15,13 @@ public class GameContext {
 	private static MainMenu menu;
 	private static GameSession gameSession;
 	private static Player player;
-	private boolean paused = false;
+	private static boolean paused = false;
 
 	public static void main(String[] args) {
 		GameContext context = new GameContext();
 		menu = MainMenu.createView(context, Options.WINDOW_WIDTH, Options.WINDOW_HEIGHT, Options.getStrings().getTitle());
 		menu.setVisible(true);
-		//TODO: add nickname feature
-		player = new Player();
+		
 	}
 	
 	public void pauseGame() {
@@ -35,6 +36,8 @@ public class GameContext {
 		//and don't start the game before all players are ready
 		paused = false;
 		gameSession = new GameSession();
+		//TODO: add nickname feature
+		player = new Player();
 		player.setReady();
 		gameSession.addPlayer(player);
 		if (gameSession.isHost(player)&&gameTimer==null) {
@@ -69,6 +72,13 @@ public class GameContext {
 		paused = false;
 	}
 	
+	public static void gameOver(Player p) {
+		paused = true;
+		gameSession.close(p);
+		JOptionPane.showMessageDialog(menu, "Game Over \n Your score is "+p.getScore());
+		menu.switchToMenuPane();
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -90,6 +100,12 @@ public class GameContext {
 		return player;
 	}
 	
+	
+	public static void updateMenu() {
+		menu.updateUI();
+	}
+	
+
 	private TimerTask getTickDispatchTask() {
 		return new TimerTask() {
 			@Override
@@ -100,9 +116,5 @@ public class GameContext {
 				menu.updateUI();
 			}
 		};
-	}
-	
-	public static void updateMenu() {
-		menu.updateUI();
 	}
 }

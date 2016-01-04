@@ -15,6 +15,7 @@ public class GameSession {
 	//collision is improbable in single player mode
 	//TODO:in multiplayer mode is quite improbable, though this issue should be thoroughly considered
 	private static final long sessionId = System.currentTimeMillis();
+	private boolean closed = false;
 	
 	public static final long getSessionId() {
 		return sessionId;
@@ -37,6 +38,14 @@ public class GameSession {
 	 */
 	public static boolean isHost(NetworkPlayer player) {
 		return true;
+	}
+	
+	public boolean isClosed() {
+		return closed;
+	}
+	
+	public void close(NetworkPlayer player) {
+		closed = true;
 	}
 
 }

@@ -18,7 +18,7 @@ public class GameField {
 	/**
 	 * game field represented as an array of cells
 	 */
-	private static FieldCell[][] cells;
+	private FieldCell[][] cells;
 	/**
 	 * area where all puyos are prepared to drop onto the game field
 	 */
@@ -291,6 +291,7 @@ public class GameField {
 				else release(nextTuple.get(0));
 		}
 		//playerPuyo = new ArrayList<Puyo>();
+		GameContext.gameOver(player);
 		return false;
 	}
 	

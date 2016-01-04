@@ -11,7 +11,6 @@ public class Player implements NetworkPlayer {
 	private int score;
 	private GameField gameField;
 	private boolean ready= false;
-	private int[] nextTuple;
 	
 	
 	public void updateScore(int bonusPoints) {

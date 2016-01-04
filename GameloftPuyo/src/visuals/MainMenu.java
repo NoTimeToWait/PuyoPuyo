@@ -106,6 +106,8 @@ public class MainMenu extends JFrame{
 	}
 	
 	public void switchToMenuPane() {
+		
+		
 		if (btnPane==null) {
 			btnPane = new JPanel();
 			btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.Y_AXIS));
@@ -157,12 +159,15 @@ public class MainMenu extends JFrame{
 			btnPane.add(exitBtn);
 			btnPane.add(Box.createVerticalGlue());
 		}
-		continueBtn.setVisible(gamePane==null? false : true);
 		currentPane.setVisible(false);
 		this.getContentPane().remove(currentPane);
+		if (gameContext.getGameSession().isClosed())  
+			gamePane = null;
+		continueBtn.setVisible(gamePane==null? false : true);
 		currentPane = btnPane;
 		currentPane.setVisible(true);
 		this.getContentPane().add(btnPane, BorderLayout.CENTER);
+		btnPane.repaint();
 	}
 	
 	public void switchToGamePane() {
