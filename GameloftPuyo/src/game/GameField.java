@@ -26,6 +26,7 @@ public class GameField {
 	
 	private HashSet<GameObject> gameObjects;
 	private ArrayList<Puyo> playerPuyo;
+	private ArrayList<Puyo> nextTuple;
 	private ArrayList<Point> rotationPoints;
 	
 	private ChainCombo chainCombo;
@@ -43,6 +44,7 @@ public class GameField {
 			for (int j=0; j<height; j++)
 				cells[i][j] = new FieldCell();
 		playerPuyo = new ArrayList<Puyo>();
+		nextTuple = new ArrayList<Puyo>();
 		gameObjects = new HashSet<GameObject>();
 		rotationPoints = new ArrayList<Point>();
 		rotationPoints.add(new Point(1,0));
@@ -273,22 +275,34 @@ public class GameField {
 	 * @return
 	 */
 	public boolean spawnPlayerTuple(int color1, int color2) {
-		playerPuyo = new ArrayList<Puyo>();
-		playerPuyo.add(color1==0? new Puyo() : new Puyo(color1));
-		if (spawn(playerPuyo.get(0), width/2, 0, true)) {
-			playerPuyo.add(color2==0? new Puyo() : new Puyo(color2));
-				if (spawn(playerPuyo.get(1), width/2, 1, true)) {
+		if (nextTuple.isEmpty()) {
+			nextTuple.add(new Puyo()); nextTuple.add(new Puyo());
+		}
+		//playerPuyo = new ArrayList<Puyo>();
+		//playerPuyo.add(color1==0? new Puyo() : new Puyo(color1));
+		if (spawn(nextTuple.get(0), width/2, 0, true)) {
+				if (spawn(nextTuple.get(1), width/2, 1, true)) {
 					spawnTick = tickCount;
+					playerPuyo = nextTuple;
+					nextTuple = new ArrayList<Puyo>();
+					nextTuple.add(new Puyo()); nextTuple.add(new Puyo());
 					return true;
 				}
-				else release(playerPuyo.get(0));
+				else release(nextTuple.get(0));
 		}
-		playerPuyo = new ArrayList<Puyo>();
+		//playerPuyo = new ArrayList<Puyo>();
 		return false;
 	}
 	
 	public void prepareNextTuple() {
 		playerPuyo = new ArrayList<Puyo>();
+	}
+	
+	public int[] getNextTuple() {
+		int[] result = new int[nextTuple.size()];
+		for (int i=0; i<nextTuple.size(); i++)
+			result[i] = nextTuple.get(i).getType();
+		return result;
 	}
 	
 	public class FieldCell {

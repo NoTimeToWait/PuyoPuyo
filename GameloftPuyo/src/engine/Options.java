@@ -37,6 +37,7 @@ public class Options {
 	 * Keybindings
 	 */
 	
+	public static int PLAYER1_ESC_KEY = KeyEvent.VK_ESCAPE;
 	public static int PLAYER1_UP_KEY = KeyEvent.VK_UP;
 	public static int PLAYER1_DOWN_KEY = KeyEvent.VK_DOWN;
 	public static int PLAYER1_LEFT_KEY = KeyEvent.VK_LEFT;

@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 
+import javax.swing.JPanel;
+
 import engine.NetworkPlayer;
 import engine.Options;
 import game.GameObject;
@@ -18,6 +20,7 @@ public class Animation {
 	protected boolean isFinished = false;
 	//protected int startTick;
 	protected AnimationListener listener;
+	public static int MARGIN = 0;
 	
 	//TODO: load images in background thread if heavy, not necessary now
 	public static final Image[] images;
@@ -38,7 +41,7 @@ public class Animation {
 	}
 	
 	
-	public void animate(Graphics graphics, ImageObserver imgObs) {
+	public void animate(Graphics graphics, JPanel pane) {
 		iteration++;
 		if (animationLength*Options.getFramesPerTick()<=iteration)
 			isFinished = true;
@@ -46,22 +49,23 @@ public class Animation {
 			isFinished = true;
 			listener.onAnimationEnd();
 		}
-		drawObject(graphics, imgObs);
+		if (object!=null) drawObject(graphics, pane, object.getType(), getDrawX(), getDrawY());
 		
 	}
 	
-	protected void drawObject(Graphics g, ImageObserver imgObs) {
-		if (object==null) return;
-		switch (object.getType()) {
+	protected static void drawObject(Graphics g, JPanel pane, int type, int x, int y) {
+		int marginX = pane.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
+		int marginY = MARGIN;
+		switch (type) {
 		case Puyo.RED|GameObject.PUYO_TYPE_MASK: 
-			g.drawImage(images[0], getDrawX(), getDrawY(), imgObs); break;
+			g.drawImage(images[0], marginX+x, marginY+y, pane); break;
 		case Puyo.GREEN|GameObject.PUYO_TYPE_MASK: 
-			g.drawImage(images[1], getDrawX(), getDrawY(), imgObs); break;
+			g.drawImage(images[1], marginX+x, marginY+y, pane); break;
 		case Puyo.BLUE|GameObject.PUYO_TYPE_MASK: 
-			g.drawImage(images[2], getDrawX(), getDrawY(), imgObs); break;
+			g.drawImage(images[2], marginX+x, marginY+y, pane); break;
 		case Puyo.YELLOW|GameObject.PUYO_TYPE_MASK: 
-			g.drawImage(images[3], getDrawX(), getDrawY(), imgObs); break;
-		default: g.drawImage(images[4], getDrawX(), getDrawY(), imgObs);
+			g.drawImage(images[3], marginX+x, marginY+y, pane); break;
+		default: g.drawImage(images[4], marginX+x, marginY+y, pane); 
 		};
 	}
 	

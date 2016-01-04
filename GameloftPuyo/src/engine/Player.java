@@ -10,6 +10,8 @@ public class Player implements NetworkPlayer {
 	private int score;
 	private GameField gameField;
 	private boolean ready= false;
+	private int[] nextTuple;
+	
 	
 	public void updateScore(int bonusPoints) {
 		score+=bonusPoints;
@@ -17,6 +19,10 @@ public class Player implements NetworkPlayer {
 	
 	public int getScore() {
 		return score;
+	}
+	
+	public int[] getPuyos() {
+		return gameField.getNextTuple();
 	}
 	
 	public boolean dispatchTick(NetworkPlayer dispatcher) {

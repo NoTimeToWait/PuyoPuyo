@@ -48,7 +48,7 @@ public class MainMenu extends JFrame{
 		menu.setSize(width, height);
 		menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		menu.gameContext = gameContext;
-		menu.setBackground(Color.GRAY);
+		menu.setBackground(Color.WHITE);
 		menu.getContentPane().add(new JPanel(), BorderLayout.WEST);
 		menu.getContentPane().add(new JPanel(), BorderLayout.EAST);
 		menu.switchToMenuPane();
@@ -64,6 +64,12 @@ public class MainMenu extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				menu.actionPerformedMap.put(GameEvent.USERINPUT_DOWN.toString(), -System.currentTimeMillis());
+			}	
+		});
+		actionMap.put("p1_escape", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (menu.currentPane!=menu.btnPane) gameContext.pauseGame();
 			}	
 		});
 		return menu;
@@ -87,6 +93,7 @@ public class MainMenu extends JFrame{
 	}
 	
 	private static void mapKeybindings(InputMap inputMap) {
+		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_ESC_KEY, 0), "p1_escape");
 		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_UP_KEY, 0), "p1_up");
 		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_DOWN_KEY, 0), "p1_down");
 		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER1_DOWN_KEY, 0, true), "p1_down_released");
@@ -99,7 +106,7 @@ public class MainMenu extends JFrame{
 		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_RIGHT_KEY, 0), "p2_right");
 	}
 	
-	private void switchToMenuPane() {
+	public void switchToMenuPane() {
 		if (btnPane==null) {
 			btnPane = new JPanel();
 			btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.Y_AXIS));
@@ -111,8 +118,8 @@ public class MainMenu extends JFrame{
 			continueBtn.addActionListener( new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					gameContext.continueGame();
 					switchToGamePane();
+					gameContext.continueGame();
 				}
 			});
 			startBtn.addActionListener( new ActionListener() {
@@ -143,7 +150,6 @@ public class MainMenu extends JFrame{
 						
 			btnPane.add(Box.createVerticalGlue());
 			btnPane.add(continueBtn);
-			continueBtn.setVisible(false);
 			btnPane.add(Box.createVerticalStrut(30));
 			btnPane.add(startBtn);
 			btnPane.add(Box.createVerticalStrut(30));
@@ -152,7 +158,7 @@ public class MainMenu extends JFrame{
 			btnPane.add(exitBtn);
 			btnPane.add(Box.createVerticalGlue());
 		}
-		
+		continueBtn.setVisible(gamePane==null? false : true);
 		currentPane.setVisible(false);
 		this.getContentPane().remove(currentPane);
 		currentPane = btnPane;
@@ -160,7 +166,7 @@ public class MainMenu extends JFrame{
 		this.getContentPane().add(btnPane, BorderLayout.CENTER);
 	}
 	
-	private void switchToGamePane() {
+	public void switchToGamePane() {
 		if (gamePane==null) {
 			gamePane = new FieldView();
 			//gamePane.setBounds(30, 30, Options.DEFAULT_FIELD_WIDTH*Options.CELL_WIDTH, Options.DEFAULT_FIELD_HEIGHT*Options.CELL_WIDTH);
@@ -177,7 +183,7 @@ public class MainMenu extends JFrame{
 		this.getContentPane().add(gamePane, BorderLayout.CENTER);
 	}
 	
-	private void switchToOptionsPane() {
+	public void switchToOptionsPane() {
 		if (optionsPane==null) { 
 			optionsPane = new JPanel();
 			JButton backBtn = new JButton(Options.getStrings().getBackBtnText());
@@ -202,6 +208,7 @@ public class MainMenu extends JFrame{
 	 * @param drawAll
 	 */
 	public void updateUI() {
+		if (gamePane==null) return;
 		for (NetworkPlayer player:GameContext.getGameSession().getPlayers()) 
 			gamePane.updateObjects(player);
 	}
