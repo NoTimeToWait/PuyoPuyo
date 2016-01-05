@@ -46,7 +46,7 @@ public class GameContext {
 		}
 		if (uiTimer==null) {
 			uiTimer = new Timer();
-			uiTimer.schedule(getUIUpdateTask(), Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
+			uiTimer.scheduleAtFixedRate(getUIUpdateTask(), Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
 		}
 	}
 
@@ -56,7 +56,9 @@ public class GameContext {
 	
 	public static void gameOver(Player p) {
 		paused = true;
+
 		gameSession.close(p);
+
 		JOptionPane.showMessageDialog(menu, Options.getStrings().getGameOverMsg()+p.getScore());
 		menu.switchToMenuPane();
 	}
