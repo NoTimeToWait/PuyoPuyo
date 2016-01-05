@@ -174,12 +174,7 @@ public class MainMenu extends JFrame{
 	public void switchToGamePane() {
 		if (gamePane==null) {
 			gamePane = new FieldView();
-			//gamePane.setBounds(30, 30, Options.DEFAULT_FIELD_WIDTH*Options.CELL_WIDTH, Options.DEFAULT_FIELD_HEIGHT*Options.CELL_WIDTH);
-			//gamePane.setSize(Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH);
-			gamePane.setPreferredSize(new Dimension(Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH));
-			//this.setBackground(Color.BLUE);
-			gamePane.setBackground(Color.WHITE);
-			
+			gamePane.setPreferredSize(new Dimension(Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH+100, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT));
 		}
 		currentPane.setVisible(false);
 		this.getContentPane().remove(currentPane);
