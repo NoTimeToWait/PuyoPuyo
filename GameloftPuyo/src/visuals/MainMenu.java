@@ -29,6 +29,7 @@ import engine.Options.Languages;
 import engine.Player;
 import engine.Strings;
 import game.GameEvent;
+import game.GameField;
 
 public class MainMenu extends JFrame{
 	
@@ -165,10 +166,18 @@ public class MainMenu extends JFrame{
 			btnPane.add(exitBtn);
 			btnPane.add(Box.createVerticalGlue());
 		}
-		currentPane.setVisible(false);
-		this.getContentPane().remove(currentPane);
+		System.out.println("2222xxx");
+		if (!gameContext.getGameSession().isClosed()) {
+			currentPane.setVisible(false);
+			System.out.println("2222xxxx");
+			this.getContentPane().removeAll();
+			//this.getContentPane().remove(currentPane);
+			System.out.println("2222xxxxx");
+		}
 		if (gameContext.getGameSession().isClosed())  
 			gamePane = null;
+
+		System.out.println("2222xxxxxx");
 		continueBtn.setVisible(gamePane==null? false : true);
 		currentPane = btnPane;
 		currentPane.setVisible(true);
@@ -252,7 +261,7 @@ public class MainMenu extends JFrame{
 		if (gamePane==null) return;
 		for (NetworkPlayer player:GameContext.getGameSession().getPlayers()) 
 			gamePane.updateObjects(player);
-		gamePane.updateScore();
+		//gamePane.updateScore();
 	}
 	
 	public void repaintUI(boolean drawAll) {
