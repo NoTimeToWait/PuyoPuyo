@@ -1,5 +1,10 @@
 package engine;
 
+/**
+ * localized strings
+ *
+ */
+
 public class StringsRU extends Strings{
 	protected String TITLE = "Gameloft 111";
 	protected String VERSION = "v0.9";

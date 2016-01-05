@@ -1,4 +1,9 @@
 package engine;
+/**
+ * a simple class to handle strings and localization
+ * a bit crude right now, though could be improved by reading strings from file
+ *
+ */
 
 public class Strings {
 	protected String TITLE = "Gameloft PuyoPuyo";

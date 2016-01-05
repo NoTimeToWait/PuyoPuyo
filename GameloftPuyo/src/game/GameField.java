@@ -9,26 +9,56 @@ import engine.Options;
 import engine.Player;
 import visuals.FieldView;
 
+/**
+ * a main class for inner logic of the game
+ * most in-game calculations happen here as well as processing of in-game events
+ *
+ */
+
 public class GameField {
+	/**
+	 * a player who owns this game field
+	 */
 	private Player player;
+	/**
+	 * game field dimensions (as a number of game cells)
+	 */
 	private int width;
 	private int height;
+	
+	/**
+	 * elapsed game time
+	 */
 	public static int tickCount;
+	/**
+	 * a tick when player puyos were spawned last time
+	 */
 	public static int spawnTick;
 	/**
 	 * game field represented as an array of cells
 	 */
 	private FieldCell[][] cells;
+	
 	/**
-	 * area where all puyos are prepared to drop onto the game field
+	 * a set of game objects for this field
 	 */
-	//private FieldCell[][] stagingArea; 
-	
 	private HashSet<GameObject> gameObjects;
-	private ArrayList<Puyo> playerPuyo;
-	private ArrayList<Puyo> nextTuple;
-	private ArrayList<Point> rotationPoints;
 	
+	/**
+	 * a list of puyos under player's control
+	 */
+	private ArrayList<Puyo> playerPuyo;
+	/**
+	 * a list of puyos to spawn next time when spawn command is issued
+	 */
+	private ArrayList<Puyo> nextTuple;
+	/**
+	 * a set of rotation vectors
+	 */
+	private ArrayList<Point> rotationPoints;
+	/**
+	 * a variable to contain last chain combo (which is not yet expired)
+	 */
 	private ChainCombo chainCombo;
 	
 	public GameField(Player player) {
@@ -59,15 +89,22 @@ public class GameField {
 	 * dispatch an event to the game field
 	 */
 	public synchronized boolean dispatchEvent(GameEvent event) {
+		//return false if there are no puyos under player control on the field
 		if (playerPuyo.isEmpty()) return false;
+		//return false if we are ready to spawn new set of player puyos
+		//no need for stilled puyos to consume events
 		for (Puyo puyo:playerPuyo)
 			if (puyo.getState().isFixed()) return false;
+		//consume input events
 		if (event.equals(GameEvent.USERINPUT_LEFT)) {
+			//check if we have space to shift puyos
 			for (Puyo puyo:playerPuyo)
 				if (puyo.getColumn()-1<0
 					|| !(cells[puyo.getColumn()-1][puyo.getLine()].isEmpty()||playerPuyo.contains(cells[puyo.getColumn()-1][puyo.getLine()].gameObject)))
 						return false;
+			//release cells from which puyos were shifted
 			for (Puyo puyo:playerPuyo) cells[puyo.getColumn()][puyo.getLine()].release();
+			//place puyos into a new set of cells after shift
 			for (Puyo puyo:playerPuyo) {
 				cells[puyo.getColumn()-1][puyo.getLine()].fill(puyo,puyo.getColumn()-1, puyo.getLine());
 				puyo.setCoordinates(puyo.getColumn()-1, puyo.getLine());
@@ -85,10 +122,12 @@ public class GameField {
 			}
 		}
 		if (event.equals(GameEvent.USERINPUT_UP)) {
+			//calculate orientation of puyos
 			int difX = playerPuyo.get(0).getColumn()-playerPuyo.get(1).getColumn();
 			int difY = playerPuyo.get(0).getLine()-playerPuyo.get(1).getLine();
 			int index = rotationPoints.indexOf(new Point(difX, difY));
 			for (int i=0; i<4; i++) {
+				//choose where to rotate next
 				Point rotationPoint = rotationPoints.get((index+1+i)%rotationPoints.size());
 				int col = playerPuyo.get(1).getColumn()+rotationPoint.x;
 				int line = playerPuyo.get(1).getLine()+rotationPoint.y;
@@ -98,6 +137,7 @@ public class GameField {
 				playerPuyo.get(0).setCoordinates(col, line);
 				break;
 			}
+			//perform rotation
 			FieldView.shift(playerPuyo.get(0));
 		}
 		if (event.equals(GameEvent.USERINPUT_DOWN)) 
@@ -112,23 +152,29 @@ public class GameField {
 	 */
 	public synchronized boolean dispatchTick() {
 		tickCount++;
+		//check if combo (if exists) has expired
 		if (chainCombo!=null && Math.abs(tickCount-chainCombo.tick)>2) {
 			player.updateScore(chainCombo.getScore());
 			chainCombo=null;
 		}
+		//spawn player puyos if necessary
 		boolean nextPlayerTuple = false;
 		for (Puyo puyo:playerPuyo)
 			if (puyo.getState().isFixed()) {
 				nextPlayerTuple = true; break;
 			}
+		//if any player puyo was fixed, another puyos become simple game objects
+		//and player is not able to control them any more
 		if (nextPlayerTuple) 
 			for (Puyo puyo:playerPuyo)
 				if (!puyo.getState().isFixed()) 
 					puyo.setState(GameObjectState.FALLING_FAST);
+		//thus if player has no puyos under his control, spawn new set of puyos
 		if (tickCount%Options.SLOW_DROP_TICKS==1 && (nextPlayerTuple || playerPuyo.isEmpty()))
 			// if couldn't spawn new puyos, the game is over (no free space to spawn)
 			if (!spawnPlayerTuple(0,0)) return false;
-			
+		
+		//process all other puyos on the field	
 		updateField();
 		return true;
 	}
@@ -151,7 +197,7 @@ public class GameField {
 	
 	private void updateField() {
 		
-		//fixate objects
+		//fixate objects which are on the lowest row or above another fixed object
 		for (int j=height-1; j>=0; j--)
 			for (int i=0; i<width; i++)
 				if (j==height-1 || cells[i][j+1].getState().isFixed())
@@ -187,10 +233,7 @@ public class GameField {
 					release(puyo);
 			}
 		}
-		
-
-		//update graphics
-		
+				
 		//change state to FALLING_FAST for all puyos hanging in air after chain release
 		if (released)
 			for (int j=height-2; j>=0; j--)
@@ -215,9 +258,9 @@ public class GameField {
 	/**
 	 * find any adjacent Puyo. 
 	 * Puyo is considered adjacent if it has the same color and is a vertical or horizontal neighbour
-	 * @param col column number of a field cell
-	 * @param line line number of a field cell
-	 * @return returns adjacent puyos (puyo in this field cell and neighbour puyos with the same color)
+	 * @param chainmap a matrix of values which corresponds to the field of cells, where we will map our chains
+	 * @param source an initial game object
+	 * @param adjacentPuyos a list of adjacent puyos (puyo in this field cell and neighbour puyos with the same color)
 	 */
 	private void findAdjacentPuyos(int[][] chainmap, Puyo source, ArrayList<Puyo> adjacentPuyos) {		
 		int chainNum = chainmap[source.getColumn()][source.getLine()];

@@ -8,10 +8,14 @@ import javax.swing.JOptionPane;
 import visuals.FieldView;
 import visuals.MainMenu;
 
+/**
+ * The main class of the game which represents a context that contains all entities and their behaviour
+ *
+ */
+
 public class GameContext {
 	
 	private Timer gameTimer;
-	private Timer uiTimer;
 	private static MainMenu menu;
 	private static GameSession gameSession;
 	private static Player player;
@@ -40,15 +44,17 @@ public class GameContext {
 		player = new Player();
 		player.setReady();
 		gameSession.addPlayer(player);
-		if (gameSession.isHost(player)&&gameTimer==null) {
-		TimerTask task = new TimerTask() {
-			 int frameCount=0;
+		if (gameTimer==null) {
+			// the task that will render frames and dispatch game ticks (counter which represents elapsed game time)
+			TimerTask task = new TimerTask() {
+				int frameCount=0;
 				@Override
 				public void run() {
 					if (menu==null) return;
 					if (paused) return;
 					if (frameCount%Options.getFramesPerTick()==0) {
 					//host should update all players elapsed game time
+					if (gameSession.isHost(player))
 						for (NetworkPlayer player:gameSession.getPlayers())
 							//if player is not responding - finish current game
 							//TODO:  handle different messages depending on the reason of interruption
@@ -61,8 +67,8 @@ public class GameContext {
 					frameCount++;
 				}
 			};
-		gameTimer = new Timer();
-		gameTimer.schedule(task,Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
+			gameTimer = new Timer();
+			gameTimer.schedule(task,Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
 		}
 		
 	}
@@ -71,17 +77,16 @@ public class GameContext {
 		paused = false;
 	}
 	
-	public static void gameOver(NetworkPlayer p) {
+	public void gameOver(NetworkPlayer p) {
 		paused = true;
 		gameSession.close(p);
 		JOptionPane.showMessageDialog(menu, Options.getStrings().getGameOverMsg()+p.getScore());
 		menu.switchToMenuPane();
-		//System.exit(0);
 	}
 	
 	/**
+	 * the access point to the current game session
 	 * 
-	 * @return
 	 */
 	public static GameSession getGameSession() {
 		//right now just returns a new object, 
@@ -100,33 +105,5 @@ public class GameContext {
 		return player;
 	}
 	
-	private TimerTask getTickDispatchTask() {
-		return new TimerTask() {
-			@Override
-			public void run() {
-				if (menu==null) return;
-				if (paused) return;
-				//host should update all players elapsed game time
-				for (NetworkPlayer player:gameSession.getPlayers())
-					player.dispatchTick(GameContext.this.player);
-				menu.updateObjects();
-			}
-		};
-	}
-	
-	private TimerTask getUIUpdateTask() {
-		return new TimerTask() {
-			@Override
-				public void run() {
-				if (menu==null) return;
-				if (paused) return;
-				menu.repaintUI(true);
-			}
-		};
-	}
-		
-	//public static void updateMenu() {
-	//	menu.updateObjects();
-	//}
 	
 }

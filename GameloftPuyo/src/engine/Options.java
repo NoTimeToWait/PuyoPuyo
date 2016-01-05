@@ -2,6 +2,13 @@ package engine;
 
 import java.awt.event.KeyEvent;
 
+/**
+ * this class contains options and configuration data.
+ * Later a "save/load from file" feature could be implemented
+ * to provide persistence of the config data
+ *
+ */
+
 public class Options {
 	/**
 	 * time in milliseconds between game ticks
@@ -17,6 +24,9 @@ public class Options {
 		return ANIMATION_ITERATIONS;//return Math.min(ANIMATION_ITERATIONS,  GAME_TICK_TIME*FRAMERATE/1000);
 	}
 	
+	/**
+	 * how much slower puyos controlled by player fall
+	 */
 	public static int SLOW_DROP_TICKS = 3;
 	
 	/**
@@ -26,8 +36,14 @@ public class Options {
 	public static int DEFAULT_FIELD_HEIGHT = 12;
 	public static int CELL_WIDTH = 32;
 	
+	/**
+	 * game version
+	 */
+	public static int NUMERIC_VERSION = 10;
 	
-	public static int NUMERIC_VERSION = 1;
+	/**
+	 * default video parameters
+	 */
 	public static int WINDOW_WIDTH = 640;
 	public static int WINDOW_HEIGHT = 480;
 	
@@ -55,6 +71,9 @@ public class Options {
 		ENGLISH, RUSSIAN
 	}
 	
+	/**
+	 * selected language	
+	 */
 	public static Languages LANGUAGE = Languages.ENGLISH;
 	
 	/**
