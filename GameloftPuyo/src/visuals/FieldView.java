@@ -49,8 +49,32 @@ public class FieldView extends JPanel {
 	
 	public FieldView() {
 		super();
-		animations = new ArrayList<Animation>(); 
-		this.setLayout(new BorderLayout());
+		animations = new ArrayList<Animation>();
+		int width = this.getWidth();
+		this.setLayout(null);
+		fieldPane = getFieldPane();
+		//fieldPane.setBounds(0, 36, 192, 384);
+		int fieldWidth =  Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH;
+		fieldPane.setBounds(Options.WINDOW_WIDTH/2-fieldWidth/2, Options.CELL_WIDTH, fieldWidth,	Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
+		scorePane = new JPanel();
+		//scorePane.setBounds(0, 0, 192, 30);
+		scorePane.setBounds((Options.WINDOW_WIDTH-fieldWidth)/2, 0, fieldWidth, 30);
+		score = new JLabel(Options.getStrings().getScoreLblText()+":");
+		scorePane.add(score);
+		nextPane = new JPanel(){
+			public void paint(Graphics g) {
+				super.paint(g);
+				int[] puyos = GameContext.getPlayer().getPuyos();
+				for (int i=0; i<puyos.length; i++)
+					Animation.drawObject(g, fieldPane, puyos[i], 18, 24+i*Options.CELL_WIDTH);
+			}
+		};
+		//nextPane.setBounds(200, 30, 36, 100);
+		nextPane.setBounds((Options.WINDOW_WIDTH+fieldWidth)/2, Options.CELL_WIDTH, Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
+		this.add(fieldPane);
+		this.add(scorePane);
+		this.add(nextPane);
+		/*this.setLayout(new BorderLayout());
 		this.setAlignmentY(TOP_ALIGNMENT);
 		
 		fieldPane = getFieldPane();
@@ -58,14 +82,11 @@ public class FieldView extends JPanel {
 														Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT));
 		
 		scorePane = new JPanel();
-		//scorePane.setPreferredSize(new Dimension(Options.CELL_WIDTH*(Options.DEFAULT_FIELD_WIDTH+1), 32));
 		score = new JLabel(Options.getStrings().getScoreLblText()+":");
 		score.setPreferredSize(new Dimension(Options.CELL_WIDTH*(Options.DEFAULT_FIELD_WIDTH+2), 18));
-		//score.setPreferredSize(new Dimension(174, 18));
 		score.setHorizontalAlignment(JLabel.LEFT);
 		score.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 		scorePane.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-		//scorePane.setBounds(0, 4, 192, 32);
 		scorePane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		scorePane.add(score);
 		
@@ -73,13 +94,11 @@ public class FieldView extends JPanel {
 			public void paint(Graphics g) {
 				super.paint(g);
 				int[] puyos = GameContext.getPlayer().getPuyos();
-				//g.clearRect(0, 0, nextPane.getWidth(), nextPane.getHeight());
 				for (int i=0; i<puyos.length; i++)
 					Animation.drawObject(g, fieldPane, puyos[i], 18, 24+i*Options.CELL_WIDTH);
 			}
 		};
 		nextPane.setPreferredSize(new Dimension(Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT));
-		//nextPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		JLabel nextLabel = new JLabel(Options.getStrings().getNextBtnText()+":");
 		nextLabel.setVerticalAlignment(JLabel.TOP);
 		nextLabel.setPreferredSize(new Dimension(Options.CELL_WIDTH*2, Options.CELL_WIDTH*3));
@@ -95,7 +114,7 @@ public class FieldView extends JPanel {
 		centerPane.add(fieldPane);
 		centerPane.add(nextPane);
 		this.add(northPane, BorderLayout.NORTH);
-		this.add(centerPane, BorderLayout.CENTER);
+		this.add(centerPane, BorderLayout.CENTER);*/
 	}
 	
 	public static void shift(GameObject obj) {
@@ -125,22 +144,11 @@ public class FieldView extends JPanel {
 				newAnimations.add(new TranslationY(obj, 1));
 			} else newAnimations.add(new Animation(obj, 1));
 		}
-		//newAnimations.add(Animation.getUpdateCounter(player, this));
 		animations = newAnimations;
-		//System.out.println("Updated animations:"+animations.size());
 	}
 		
-	
-	/*
-	public void drawObjects(NetworkPlayer player) {
-					
-		drawObjects = player.getGameObjects(true);
-		repaint();
-	}*/
-	
+		
 	public static void chainCombo(int comboCount) {
-		//score.setText(Options.getStrings().getChainComboString()+" x"+comboCount);
-		//scorePane.repaint();
 		chainCombo = comboCount;
 		
 	}
@@ -202,57 +210,6 @@ public class FieldView extends JPanel {
 				if(chainCombo>1)
 					g.drawImage(getChainComboImage(Options.getStrings().getChainComboString()+" x"+chainCombo), 0, 0, this);
 				
-			    
-				/*BufferedImage message = getGraphicsConfiguration().createCompatibleImage(300, 100);
-				Graphics g2 = message.createGraphics();
-				g2.setColor(Color.GRAY);
-				g2.fillRect(0, 0, 300, 100);
-				g2.setColor(Color.RED);
-				g2.drawImage(Animation.images[0], 0, 0, this);
-				//g2.drawChars("111".toCharArray(), 0, 3, 0, 0);
-				//g2.drawRect(0, 0, 100, 100);
-				 Graphics2D g2d = (Graphics2D)g;
-			     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-				   
-				g2d.drawString(Options.getStrings().getChainComboString()+" x"+chainCombo, 0, 0);
-				g.drawImage(message, 0, 0, this);*/
-				
-				
-				/*Image[] images = Animation.images;
-				drawObjects = GameContext.getPlayer().getGameObjects(true);
-				if (drawObjects==null) return;
-				if ( GameField.cells!=null)
-				for (int i=0; i<6; i++)
-					for (int j=0; j<12; j++) {
-						GameObject obj = GameField.cells[i][j].gameObject;
-						if (obj!=null)
-						switch (obj.getType()) {
-						case Puyo.RED|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[0],400+i*32, j*32, this); break;
-						case Puyo.GREEN|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[1],400+i*32, j*32, this); break;
-						case Puyo.BLUE|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[2],400+i*32, j*32, this); break;
-						case Puyo.YELLOW|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[3],400+i*32, j*32, this); break;
-						default: g.drawImage(images[4],400+i*32, j*32, this);
-					};
-					}
-					
-				/*
-				for (GameObject obj:drawObjects) 
-					switch (obj.getType()) {
-						case Puyo.RED|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[0],obj.getDrawX(), obj.getDrawY(), this); break;
-						case Puyo.GREEN|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[1],obj.getDrawX(), obj.getDrawY(), this); break;
-						case Puyo.BLUE|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[2],obj.getDrawX(), obj.getDrawY(), this); break;
-						case Puyo.YELLOW|GameObject.PUYO_TYPE_MASK: 
-							g.drawImage(images[3],obj.getDrawX(), obj.getDrawY(), this); break;
-						default: g.drawImage(images[4],obj.getDrawX(), obj.getDrawY(), this);
-					};
-				drawObjects = null;*/
 			}
 		};
 	}

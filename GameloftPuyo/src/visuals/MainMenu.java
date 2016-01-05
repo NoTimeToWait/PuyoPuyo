@@ -48,9 +48,9 @@ public class MainMenu extends JFrame{
 		menu.setSize(width, height);
 		menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		menu.gameContext = gameContext;
-		menu.getContentPane().add(new JPanel(), BorderLayout.WEST);
-		menu.getContentPane().add(new JPanel(), BorderLayout.EAST);
-		menu.switchToMenuPane();
+		//menu.getContentPane().add(new JPanel(), BorderLayout.WEST);
+		//menu.getContentPane().add(new JPanel(), BorderLayout.EAST);
+		
 		
 		mapKeybindings(((JPanel)menu.getContentPane()).getInputMap());
 		
@@ -71,6 +71,8 @@ public class MainMenu extends JFrame{
 				if (menu.currentPane!=menu.btnPane) gameContext.pauseGame();
 			}	
 		});
+		gameContext.startGame();
+		menu.switchToGamePane();
 		return menu;
 	}
 	
@@ -184,7 +186,7 @@ public class MainMenu extends JFrame{
 		this.getContentPane().remove(currentPane);
 		currentPane = gamePane;
 		currentPane.setVisible(true);
-		this.getContentPane().add(gamePane, BorderLayout.CENTER);
+		this.getContentPane().add(gamePane);
 	}
 	
 	public void switchToOptionsPane() {
