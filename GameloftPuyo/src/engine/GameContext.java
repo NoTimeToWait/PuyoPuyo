@@ -45,6 +45,7 @@ public class GameContext {
 			TimerTask tickDispatchTask = new TimerTask() {
 				@Override
 				public void run() {
+					if (menu==null) return;
 					if (paused) return;
 					//host should update all players elapsed game time
 					for (NetworkPlayer player:gameSession.getPlayers())
@@ -60,6 +61,7 @@ public class GameContext {
 			TimerTask uiUpdateTask = new TimerTask() {
 				@Override
 					public void run() {
+					if (menu==null) return;
 					if (paused) return;
 					menu.repaintUI(true);
 				}
@@ -100,21 +102,8 @@ public class GameContext {
 		return player;
 	}
 	
-	
 	public static void updateMenu() {
 		menu.updateUI();
 	}
 	
-
-	private TimerTask getTickDispatchTask() {
-		return new TimerTask() {
-			@Override
-			public void run() {
-				//host should update all players elapsed game time
-				for (NetworkPlayer player:gameSession.getPlayers())
-					player.dispatchTick(GameContext.this.player);
-				menu.updateUI();
-			}
-		};
-	}
 }

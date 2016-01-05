@@ -71,8 +71,7 @@ public class MainMenu extends JFrame{
 				if (menu.currentPane!=menu.btnPane) gameContext.pauseGame();
 			}	
 		});
-		gameContext.startGame();
-		menu.switchToGamePane();
+		menu.switchToMenuPane();
 		return menu;
 	}
 	
@@ -185,6 +184,7 @@ public class MainMenu extends JFrame{
 		currentPane.setVisible(false);
 		this.getContentPane().remove(currentPane);
 		currentPane = gamePane;
+		gamePane.switched();
 		currentPane.setVisible(true);
 		this.getContentPane().add(gamePane);
 	}

@@ -1,33 +1,11 @@
 package visuals;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.Toolkit;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.EtchedBorder;
 
 import engine.GameContext;
 import engine.NetworkPlayer;
@@ -35,43 +13,38 @@ import engine.Options;
 import game.GameField;
 import game.GameObject;
 import game.GameObjectState;
-import game.Puyo;
 
 public class FieldView extends JPanel {
-	private GameObject[] drawObjects;
 	private static ArrayList<Animation> animations;
 	private static JLabel score;
 	private static JPanel scorePane;
-	private static JPanel fieldPane;
 	private static JPanel nextPane;
-	private static int chainCombo = 0;
-	private BufferedImage comboImage;
+	private boolean switched=false;
 	
 	public FieldView() {
 		super();
 		animations = new ArrayList<Animation>();
-		int width = this.getWidth();
 		this.setLayout(null);
-		fieldPane = getFieldPane();
 		//fieldPane.setBounds(0, 36, 192, 384);
 		int fieldWidth =  Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH;
-		fieldPane.setBounds(Options.WINDOW_WIDTH/2-fieldWidth/2, Options.CELL_WIDTH, fieldWidth,	Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
 		scorePane = new JPanel();
 		//scorePane.setBounds(0, 0, 192, 30);
-		scorePane.setBounds((Options.WINDOW_WIDTH-fieldWidth)/2, 0, fieldWidth, 30);
+		scorePane.setBounds(fieldWidth, 0, 100, 30);
 		score = new JLabel(Options.getStrings().getScoreLblText()+":");
 		scorePane.add(score);
 		nextPane = new JPanel(){
-			public void paint(Graphics g) {
-				super.paint(g);
+			public void paintComponent(Graphics g) {
+				//super.paintComponent(g);
 				int[] puyos = GameContext.getPlayer().getPuyos();
 				for (int i=0; i<puyos.length; i++)
-					Animation.drawObject(g, fieldPane, puyos[i], 18, 24+i*Options.CELL_WIDTH);
+					Animation.drawObject(g, this, puyos[i], 18, 24+i*Options.CELL_WIDTH);
 			}
 		};
+		JLabel nextLabel = new JLabel(Options.getStrings().getNextBtnText()+":");
+		nextPane.add(nextLabel);
 		//nextPane.setBounds(200, 30, 36, 100);
-		nextPane.setBounds((Options.WINDOW_WIDTH+fieldWidth)/2, Options.CELL_WIDTH, Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
-		this.add(fieldPane);
+		nextPane.setBounds(fieldWidth, Options.CELL_WIDTH, Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
+		//this.add(fieldPane);
 		this.add(scorePane);
 		this.add(nextPane);
 		/*this.setLayout(new BorderLayout());
@@ -129,6 +102,10 @@ public class FieldView extends JPanel {
 			}
 	}
 	
+	public void switched() {
+		switched = true;
+	}
+	
 	public void updateObjects(NetworkPlayer player) {
 		ArrayList<Animation> newAnimations = new ArrayList<Animation>();
 		b1: for (GameObject obj:player.getGameObjects(true)) {
@@ -148,70 +125,27 @@ public class FieldView extends JPanel {
 	}
 		
 		
-	public static void chainCombo(int comboCount) {
-		chainCombo = comboCount;
-		
-	}
 	
-	public void paint(Graphics g) {
-		fieldPane.repaint();
-		
+	public void paintComponent(Graphics g)
+	{
+		g.setColor(Color.GRAY);
+		if (switched) {
+			g.clearRect(0, 0, Options.WINDOW_WIDTH, Options.WINDOW_HEIGHT);
+			switched = false;
+		}
+		int marginX = this.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
+		int marginY = Animation.MARGIN;
+		g.fillRect(0, 0, Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT+4);
+		for (Animation anim:animations)
+			anim.animate(g, this);
+		//if(chainCombo>1)
+		//	g.drawImage(getChainComboImage(Options.getStrings().getChainComboString()+" x"+chainCombo), 0, 0, this);
 	}
 	
 	public static void repaintAdditionalInfo() {
-		scorePane.repaint();
-		nextPane.repaint();
 		score.setText(Options.getStrings().getScoreLblText()+":"+GameContext.getPlayer().getScore());
 	}
 	
-	private BufferedImage getChainComboImage(String str) {
-		if (comboImage==null) {
-			comboImage = getGraphicsConfiguration().createCompatibleImage(300, 100);
-			Graphics g2 = comboImage.createGraphics();
-			Font font = getFont();
-            setFont(font.deriveFont(Font.PLAIN, 20));
-			Graphics2D g2d = (Graphics2D)g2.create();
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-	        FontRenderContext frc = g2d.getFontRenderContext();
-	        String s = "CHAIN COMBO";
-	        TextLayout textTl = new TextLayout(s, getFont(), frc);
-	        Shape outline = textTl.getOutline(null);
-
-	        FontMetrics fm = g2d.getFontMetrics(getFont());
-	        int x = 30;//(getWidth() - outline.getBounds().width) / 2;
-	        int y = 30;//((getHeight() - outline.getBounds().height) / 2) + fm.getAscent();
-	        g2d.translate(x, y);
-
-	        Stroke stroke = g2d.getStroke();
-	        g2d.setColor(Color.BLACK);
-	        g2d.fill(outline);
-	        g2d.setStroke(new BasicStroke(3));
-	        g2d.setColor(Color.RED);
-	        g2d.draw(outline);
-	        g2d.dispose();
-		}
-		return comboImage;
-	}
 	
-	private JPanel getFieldPane() {
-		return new JPanel() {
-			public void paint(Graphics g)
-			{
-				g.setColor(Color.GRAY);
-				//if (scorePane==null) {
-				//	g.clearRect(0, 0, this.getWidth(), this.getHeight());
-				//}
-				int marginX = this.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
-				int marginY = Animation.MARGIN;
-				g.fillRect(0, 0, Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
-				for (Animation anim:animations)
-					anim.animate(g, this);
-				if(chainCombo>1)
-					g.drawImage(getChainComboImage(Options.getStrings().getChainComboString()+" x"+chainCombo), 0, 0, this);
-				
-			}
-		};
-	}
 	
 }

@@ -64,8 +64,8 @@ public class Animation {
 	
 	protected static void drawObject(Graphics g, JComponent pane, int type, int x, int y) {
 		if (images==null) return;
-		int marginX = pane.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
-		int marginY = MARGIN;
+		int marginX = 0;//pane.getWidth()/2-Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH/2;
+		int marginY = 0;//MARGIN;
 		switch (type) {
 		case Puyo.RED|GameObject.PUYO_TYPE_MASK: 
 			g.drawImage(images[0], marginX+x, marginY+y, pane); break;

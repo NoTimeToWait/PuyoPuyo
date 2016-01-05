@@ -114,7 +114,6 @@ public class GameField {
 		tickCount++;
 		if (chainCombo!=null && Math.abs(tickCount-chainCombo.tick)>2) {
 			player.updateScore(chainCombo.getScore());
-			FieldView.chainCombo(0);
 			chainCombo=null;
 		}
 		boolean nextPlayerTuple = false;
@@ -180,7 +179,6 @@ public class GameField {
 				if (chainCombo==null) chainCombo = new ChainCombo(chain, tickCount);
 				else {
 					chainCombo.add(chain);
-					FieldView.chainCombo(chainCombo.size());
 				}
 				for (Puyo puyo:chain.getChain()) 
 					release(puyo);
