@@ -67,11 +67,11 @@ public class Options {
 	 */
 	
 	public final static String[] imgLinks = new String[] {
-			"img/puyo_red.png",
-			"img/puyo_green.png",
-			"img/puyo_blue.png",
-			"img/puyo_yellow.png",
-			"img/unknown.png",
+			"puyo_red.png",
+			"puyo_green.png",
+			"puyo_blue.png",
+			"puyo_yellow.png",
+			"unknown.png",
 	};
 	
 	public static String[] getImageLinks() {

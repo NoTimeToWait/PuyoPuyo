@@ -4,7 +4,9 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -24,17 +26,22 @@ public class Animation {
 	public static int MARGIN = 0;
 	
 	//TODO: load images in background thread if heavy, not necessary now
-	public static final Image[] images;
-	static {
-		images = new Image[Options.getImageLinks().length];
-		for (int i=0; i<images.length; i++)
-			images[i] = Toolkit.getDefaultToolkit().getImage(Options.getImageLinks()[i]);
-	}
-	
+	public static Image[] images;
+		
 	public Animation (GameObject gameObject, int animationLength){
-		object = gameObject;
-		//this.startTick = startTick;
-		this.animationLength = animationLength;
+			object = gameObject;
+			//this.startTick = startTick;
+			this.animationLength = animationLength;
+			if (images==null) {
+				images = new Image[Options.getImageLinks().length];
+				for (int i=0; i<images.length; i++)
+					try {
+						images[i] = ImageIO.read(getClass().getResource(Options.getImageLinks()[i]));
+					} catch (IOException e) {
+						e.printStackTrace();
+						images[i] = Toolkit.getDefaultToolkit().getImage(getClass().getResource(Options.getImageLinks()[i]));
+					}
+			}
 	}
 	
 	public void setAnimationListener(AnimationListener listener) {
