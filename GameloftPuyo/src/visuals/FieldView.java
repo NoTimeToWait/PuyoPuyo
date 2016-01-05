@@ -140,9 +140,9 @@ public class FieldView extends JPanel {
 	}
 	
 	public void updateScore() {
-		//switched = true;
-		//score.setText(Options.getStrings().getScoreLblText()+":"+GameContext.getPlayer().getScore());
-		//nextLabel.setText(Options.getStrings().getNextBtnText()+":");
+		switched = true;
+		score.setText(Options.getStrings().getScoreLblText()+":"+GameContext.getPlayer().getScore());
+		nextLabel.setText(Options.getStrings().getNextBtnText()+":");
 	}
 	
 	

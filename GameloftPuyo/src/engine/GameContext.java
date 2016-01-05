@@ -56,9 +56,7 @@ public class GameContext {
 	
 	public static void gameOver(Player p) {
 		paused = true;
-
 		gameSession.close(p);
-
 		JOptionPane.showMessageDialog(menu, Options.getStrings().getGameOverMsg()+p.getScore());
 		menu.switchToMenuPane();
 	}
