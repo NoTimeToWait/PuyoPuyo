@@ -20,7 +20,7 @@ public class Strings {
 	protected String CHAIN_COMBO_STRING = "CHAIN COMBO";
 	protected String GAME_SPEED_LBL = "Game Speed";
 	protected String GAME_OVER_MSG = "Game Over \n Your score is ";
-	protected String[] GAME_SPEED = {"Normal", "Slow"};
+	protected String[] GAME_SPEED = {"Fast", "Normal", "Slow"};
 	
 	public String getTitle() { return TITLE;}
 	public String getVersion() { return VERSION;}

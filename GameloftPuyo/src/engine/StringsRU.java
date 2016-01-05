@@ -20,7 +20,7 @@ public class StringsRU extends Strings{
 	protected String CHAIN_COMBO_STRING = "ККККОМБО";
 	protected String GAME_SPEED_LBL = "Скорость игры";
 	protected String GAME_OVER_MSG = "Конец игры \n Ваш счет ";
-	protected String[] GAME_SPEED = {"Нормальная", "Медленная"};
+	protected String[] GAME_SPEED = {"Быстрая", "Нормальная", "Медленная"};
 	
 	public String getTitle() { return TITLE;}
 	public String getVersion() { return VERSION;}

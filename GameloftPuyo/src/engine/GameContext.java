@@ -41,13 +41,27 @@ public class GameContext {
 		player.setReady();
 		gameSession.addPlayer(player);
 		if (gameSession.isHost(player)&&gameTimer==null) {
-			gameTimer = new Timer();
-			gameTimer.schedule(getTickDispatchTask(), Options.GAME_TICK_TIME, Options.GAME_TICK_TIME);
+		TimerTask task = new TimerTask() {
+			 int frameCount=0;
+				@Override
+				public void run() {
+					if (menu==null) return;
+					if (paused) return;
+					if (frameCount%Options.getFramesPerTick()==0) {
+					//host should update all players elapsed game time
+						for (NetworkPlayer player:gameSession.getPlayers())
+							player.dispatchTick(GameContext.this.player);
+						menu.updateObjects();
+					}
+					menu.repaintUI(true);
+
+					frameCount++;
+				}
+			};
+		gameTimer = new Timer();
+		gameTimer.schedule(task,Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
 		}
-		if (uiTimer==null) {
-			uiTimer = new Timer();
-			uiTimer.scheduleAtFixedRate(getUIUpdateTask(), Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
-		}
+		
 	}
 
 	public void continueGame() {

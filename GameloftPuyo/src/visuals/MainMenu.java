@@ -194,18 +194,29 @@ public class MainMenu extends JFrame{
 			optionsPane = new JPanel();
 			optionsPane.setLayout(new BoxLayout(optionsPane, BoxLayout.Y_AXIS));
 			JComboBox<String> gameSpeedSelector = new JComboBox<String>(Options.getStrings().getGameSpeedStrings());
-			gameSpeedSelector.setSelectedIndex(Options.GAME_TICK_TIME==250? 0:1);
+			gameSpeedSelector.setFocusable(false);
+			gameSpeedSelector.setSelectedIndex(1);
 			gameSpeedSelector.setMaximumSize(new Dimension(80, 30));
 			gameSpeedSelector.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					JComboBox<String> cb = (JComboBox<String>)e.getSource();
-					if (cb.getSelectedItem().equals(Options.getStrings().getGameSpeedStrings()[1])) 
+					if (cb.getSelectedItem().equals(Options.getStrings().getGameSpeedStrings()[0])) {
+						Options.GAME_TICK_TIME = 100;
+						Options.ANIMATION_ITERATIONS = 8;
+					}
+					else if (cb.getSelectedItem().equals(Options.getStrings().getGameSpeedStrings()[2])) {
 						Options.GAME_TICK_TIME = 450;
-					else Options.GAME_TICK_TIME = 250;
+						Options.ANIMATION_ITERATIONS = 32;
+					}
+					else {
+						Options.GAME_TICK_TIME = 250;
+						Options.ANIMATION_ITERATIONS = 16;
+					}
 				}
 			});
 			JComboBox<Languages> languages = new JComboBox<Languages>((Languages[])Options.Languages.values());
+			languages.setFocusable(false);
 			languages.setMaximumSize(new Dimension(80, 30));
 			for (int i=0; i<Options.Languages.values().length; i++)
 				if (Options.LANGUAGE.equals(Options.Languages.values()[i]))
