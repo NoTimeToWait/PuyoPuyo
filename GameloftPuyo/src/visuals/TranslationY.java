@@ -2,7 +2,11 @@ package visuals;
 
 import engine.Options;
 import game.GameObject;
-
+/**
+ * vertical translation animation
+ * performs falling animation
+ *
+ */
 public class TranslationY extends Animation{
 	private int fromY;
 	private int toY;

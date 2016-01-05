@@ -6,6 +6,11 @@ import engine.GameContext;
 import engine.GameSession;
 import engine.Options;
 
+/**
+ * represents any game object on the field
+ * general use case is to track object position on the field for animation purposes
+ *
+ */
 public class GameObject {
 	protected int id;
 	protected GameObjectState state;
@@ -58,6 +63,10 @@ public class GameObject {
 		return type;
 	}
 	
+	/**
+	 * we use it mostly for animation purposes, 
+	 * so we check equality only by id to ensure that we always track the same object
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;

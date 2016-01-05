@@ -172,7 +172,7 @@ public class GameField {
 		//thus if player has no puyos under his control, spawn new set of puyos
 		if (tickCount%Options.SLOW_DROP_TICKS==1 && (nextPlayerTuple || playerPuyo.isEmpty()))
 			// if couldn't spawn new puyos, the game is over (no free space to spawn)
-			if (!spawnPlayerTuple(0,0)) return false;
+			if (!spawnPlayerTuple()) return false;
 		
 		//process all other puyos on the field	
 		updateField();
@@ -239,9 +239,10 @@ public class GameField {
 			for (int j=height-2; j>=0; j--)
 				for (int i=0; i<width; i++) 
 					if (!cells[i][j].isEmpty() && !playerPuyo.contains(cells[i][j].gameObject))
+						//if cell below is empty or object below is falling
 						if (cells[i][j+1].isEmpty() || cells[i][j+1].getState().isFalling()) {
 							cells[i][j].gameObject.setState(GameObjectState.FALLING_FAST);
-						
+						//if any chained puyo starts falling and this chain has only two objects - unchain both
 							for (PuyoChain chain:chains) 
 								if (chain.contains((Puyo)cells[i][j+1].gameObject) && chain.size()==2)
 									chain.unchain();
@@ -282,7 +283,11 @@ public class GameField {
 			}
 		}
 	}
-	
+	/**
+	 * move object one cell below
+	 * @param obj object to move
+	 * @return true if object was successfully moved
+	 */
 	private boolean drop(GameObject obj) {
 		if (!obj.getState().isFalling()) return false;
 		//slow drop is 3 times slower 
@@ -306,6 +311,10 @@ public class GameField {
 		cells[object.getColumn()][object.getLine()].release();
 	}
 	
+	/**
+	 * spawns object on the field in given coordinates
+	 * @return true if successfully spawned, false otherwise
+	 */
 	private boolean spawn(GameObject object, int column, int line, boolean isUnderControl) {
 		if (cells[column][line].fill(object, column, line)) {
 			gameObjects.add(object);
@@ -318,16 +327,12 @@ public class GameField {
 	
 	/**
 	 * TODO: make spawn as transaction
-	 * @param color1
-	 * @param color2
-	 * @return
+	 * spawn a set of puyos under player control
 	 */
-	public boolean spawnPlayerTuple(int color1, int color2) {
+	public boolean spawnPlayerTuple() {
 		if (nextTuple.isEmpty()) {
 			nextTuple.add(new Puyo()); nextTuple.add(new Puyo());
 		}
-		//playerPuyo = new ArrayList<Puyo>();
-		//playerPuyo.add(color1==0? new Puyo() : new Puyo(color1));
 		if (spawn(nextTuple.get(0), width/2, 0, true)) {
 				if (spawn(nextTuple.get(1), width/2, 1, true)) {
 					spawnTick = tickCount;
@@ -338,7 +343,6 @@ public class GameField {
 				}
 				else release(nextTuple.get(0));
 		}
-		//playerPuyo = new ArrayList<Puyo>();
 		return false;
 	}
 	
@@ -346,6 +350,10 @@ public class GameField {
 		playerPuyo = new ArrayList<Puyo>();
 	}
 	
+	/**
+	 * get staged set of puyos
+	 * @return array of int types of puyos staged to spawn
+	 */
 	public synchronized int[] getNextTuple() {
 		int[] result = new int[nextTuple.size()];
 		for (int i=0; i<nextTuple.size(); i++)
@@ -370,16 +378,20 @@ public class GameField {
 		public boolean isPuyo() {
 			return (!isEmpty()&&((gameObject.getType()&GameObject.PUYO_TYPE_MASK)==GameObject.PUYO_TYPE_MASK));
 		}
-			
+		
+		/**
+		* get state of the object in the field
+		* @return GameObjectState, will be UNKNOWN if field cell is empty
+		*/
 		public GameObjectState getState() {
 			if (isEmpty()) return GameObjectState.UNKNOWN;
 			return gameObject.getState();
 		}
 		
-		//public GameObject getObject() {
-		//	return gameObject();
-		//}
-		
+		/**
+		 * change object state to fixed state	
+		 * @return true if object was fixed
+		 */
 		public boolean fixate(){
 			//if last fall iteration of last cell row
 			if (isEmpty()) return false;

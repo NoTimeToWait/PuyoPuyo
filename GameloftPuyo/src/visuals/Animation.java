@@ -16,15 +16,27 @@ import engine.Options;
 import game.GameObject;
 import game.Puyo;
 
+/**
+ * basic class for any in-game animation per object.
+ *
+ */
+
 public class Animation {
-	
+	/**
+	 * game object to animate
+	 */
 	protected GameObject object;
+	/**
+	 * animation length in game ticks
+	 */
 	protected int animationLength;
+	/**
+	 * current step of animation sequence
+	 */
 	protected int iteration;
 	protected boolean isFinished = false;
 	//protected int startTick;
 	protected AnimationListener listener;
-	public static int MARGIN = 0;
 	
 	//TODO: load images in background thread if heavy, not necessary now
 	public static Image[] images;
@@ -52,11 +64,9 @@ public class Animation {
 	
 	public void animate(Graphics graphics, JPanel pane) {
 		iteration++;
-		if (animationLength*Options.getFramesPerTick()<=iteration)
+		if (animationLength*Options.getFramesPerTick()<=iteration) {
 			isFinished = true;
-		if (animationLength*Options.getFramesPerTick()<=iteration && listener!=null) {
-			isFinished = true;
-			listener.onAnimationEnd();
+			if (listener!=null) listener.onAnimationEnd();
 		}
 		if (object!=null) drawObject(graphics, pane, object.getType(), getDrawX(), getDrawY());
 		
@@ -87,6 +97,10 @@ public class Animation {
 		return object.getDrawY();
 	}
 	
+	/**
+	 * empty animation clock with a length of 1 game tick to update animations from game objects
+	 * has no use right now
+	 */
 	public static Animation getUpdateCounter(NetworkPlayer player, FieldView fieldView) {
 		Animation result = new Animation(null, 1);
 		result.setAnimationListener(getUpdateAnimationsListener(player, fieldView));

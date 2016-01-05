@@ -18,8 +18,17 @@ public class FieldView extends JPanel {
 	private static ArrayList<Animation> animations;
 	private JLabel score;
 	private JLabel nextLabel;
+	/**
+	 * Panel to show player score
+	 */
 	private JPanel scorePane;
+	/**
+	 * Panel to show next set of puyos
+	 */
 	private JPanel nextPane;
+	/**
+	 * flag to show that we just switched from the main menu to the game panel
+	 */
 	private boolean switched=false;
 	
 	public FieldView() {
@@ -46,7 +55,10 @@ public class FieldView extends JPanel {
 		this.add(scorePane);
 		this.add(nextPane);
 	}
-	
+	/**
+	 * update animations for objects, that were shifted
+	 * for smooth transition between animations
+	 */
 	public static void shift(GameObject obj) {
 		for (Animation anim:animations)
 			if (obj.equals(anim.object)) {
@@ -58,11 +70,19 @@ public class FieldView extends JPanel {
 				break;
 			}
 	}
-	
+	/**
+	 * indicate that we just entered the game field from another menu
+	 * and we need to refresh UI
+	 */
 	public void switched() {
 		switched = true;
 	}
 	
+	/**
+	 * update object states and their animations for selected player
+	 * @param player whose fieldView we need to update 
+	 * (in the games of 2 players we need to know which field view we update)
+	 */
 	public void updateObjects(NetworkPlayer player) {
 		ArrayList<Animation> newAnimations = new ArrayList<Animation>();
 		b1: for (GameObject obj:player.getGameObjects(true)) {
@@ -94,7 +114,9 @@ public class FieldView extends JPanel {
 		for (Animation anim:animations)
 			anim.animate(g, this);
 	}
-	
+	/**
+	 * update score panel
+	 */
 	public void updateScore() {
 		switched = true;
 		score.setText(Options.getStrings().getScoreLblText()+":"+GameContext.getPlayer().getScore());

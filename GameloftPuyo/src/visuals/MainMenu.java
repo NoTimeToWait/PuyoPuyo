@@ -57,6 +57,7 @@ public class MainMenu extends JFrame{
 		//menu.getContentPane().add(new JPanel(), BorderLayout.EAST);
 		
 		
+		//set keybindings for main controls
 		mapKeybindings(((JPanel)menu.getContentPane()).getInputMap());
 		
 		ActionMap actionMap = ((JPanel)menu.getContentPane()).getActionMap();
@@ -79,7 +80,14 @@ public class MainMenu extends JFrame{
 		menu.switchToMenuPane();
 		return menu;
 	}
-	
+	/**
+	 * get Action for given user input event
+	 * @param menu frame to consume input
+	 * @param event a user input event to process
+	 * @param timeOffset additional delay between input readings 
+	 * @param releaseRequired set true if this button has to be released 
+	 * before consuming another event from the button
+	 */
 	private static AbstractAction getButtonAction(MainMenu menu, GameEvent event, int timeOffset, boolean releaseRequired) {
 		return new AbstractAction() {
 			@Override
@@ -111,9 +119,10 @@ public class MainMenu extends JFrame{
 		inputMap.put(KeyStroke.getKeyStroke(Options.PLAYER2_RIGHT_KEY, 0), "p2_right");
 	}
 	
+	/**
+	 * switches main frame to show main menu
+	 */
 	public void switchToMenuPane() {
-		
-		
 		if (btnPane==null) {
 			btnPane = new JPanel();
 			btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.Y_AXIS));
@@ -176,6 +185,9 @@ public class MainMenu extends JFrame{
 		btnPane.repaint();
 	}
 	
+	/**
+	 * show in-game view
+	 */
 	public void switchToGamePane() {
 		if (gamePane==null) {
 			gamePane = new FieldView();
@@ -189,6 +201,9 @@ public class MainMenu extends JFrame{
 		this.getContentPane().add(gamePane);
 	}
 	
+	/**
+	 * show options view
+	 */
 	public void switchToOptionsPane() {
 		if (optionsPane==null || languageSwitched) {
 			optionsPane = new JPanel();
@@ -256,9 +271,8 @@ public class MainMenu extends JFrame{
 	}
 	
 	/**
-	 * update game pane UI
+	 * update game pane UI and animations
 	 * 
-	 * @param drawAll
 	 */
 	public void updateObjects() {
 		if (gamePane==null) return;
