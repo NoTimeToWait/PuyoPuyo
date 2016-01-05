@@ -50,7 +50,10 @@ public class GameContext {
 					if (frameCount%Options.getFramesPerTick()==0) {
 					//host should update all players elapsed game time
 						for (NetworkPlayer player:gameSession.getPlayers())
-							player.dispatchTick(GameContext.this.player);
+							//if player is not responding - finish current game
+							//TODO:  handle different messages depending on the reason of interruption
+							if (!player.dispatchTick(GameContext.this.player))
+								gameOver(player);
 						menu.updateObjects();
 					}
 					menu.repaintUI(true);
@@ -68,11 +71,12 @@ public class GameContext {
 		paused = false;
 	}
 	
-	public static void gameOver(Player p) {
+	public static void gameOver(NetworkPlayer p) {
 		paused = true;
 		gameSession.close(p);
 		JOptionPane.showMessageDialog(menu, Options.getStrings().getGameOverMsg()+p.getScore());
 		menu.switchToMenuPane();
+		//System.exit(0);
 	}
 	
 	/**

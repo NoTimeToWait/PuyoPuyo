@@ -28,6 +28,8 @@ public class Player implements NetworkPlayer {
 	public boolean dispatchTick(NetworkPlayer dispatcher) {
 		//we need to verify the player who issued this call (that he is actually the host)
 		//and ensure that the receiver is ready to receive the call
+		//right now it will end the game,
+		//but later it is possible to add handling different situations in different ways
 		if (!GameSession.isHost(dispatcher) || !isReady() || !gameField.dispatchTick()) return false;
 		return true;
 	}

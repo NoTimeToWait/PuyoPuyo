@@ -26,10 +26,8 @@ public class FieldView extends JPanel {
 		super();
 		animations = new ArrayList<Animation>();
 		this.setLayout(null);
-		//fieldPane.setBounds(0, 36, 192, 384);
 		int fieldWidth =  Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH;
 		scorePane = new JPanel();
-		//scorePane.setBounds(0, 0, 192, 30);
 		scorePane.setBounds(fieldWidth, 0, 100, 30);
 		score = new JLabel(Options.getStrings().getScoreLblText()+":");
 		scorePane.add(score);
@@ -38,57 +36,15 @@ public class FieldView extends JPanel {
 				//super.paintComponent(g);
 				int[] puyos = GameContext.getPlayer().getPuyos();
 				for (int i=0; i<puyos.length; i++)
-					Animation.drawObject(g, this, puyos[i], 18, 24+i*Options.CELL_WIDTH);
+					Animation.drawObject(g, nextPane, puyos[i], 18, 24+i*Options.CELL_WIDTH);
 			}
 		};
 		nextLabel = new JLabel(Options.getStrings().getNextBtnText()+":");
 		nextPane.add(nextLabel);
-		//nextPane.setBounds(200, 30, 36, 100);
 		nextPane.setBounds(fieldWidth, Options.CELL_WIDTH, Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT);
-		//this.add(fieldPane);
+
 		this.add(scorePane);
 		this.add(nextPane);
-		/*this.setLayout(new BorderLayout());
-		this.setAlignmentY(TOP_ALIGNMENT);
-		
-		fieldPane = getFieldPane();
-		fieldPane.setPreferredSize(new Dimension(Options.CELL_WIDTH*Options.DEFAULT_FIELD_WIDTH, 
-														Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT));
-		
-		scorePane = new JPanel();
-		score = new JLabel(Options.getStrings().getScoreLblText()+":");
-		score.setPreferredSize(new Dimension(Options.CELL_WIDTH*(Options.DEFAULT_FIELD_WIDTH+2), 18));
-		score.setHorizontalAlignment(JLabel.LEFT);
-		score.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-		scorePane.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-		scorePane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		scorePane.add(score);
-		
-		nextPane = new JPanel(){
-			public void paint(Graphics g) {
-				super.paint(g);
-				int[] puyos = GameContext.getPlayer().getPuyos();
-				for (int i=0; i<puyos.length; i++)
-					Animation.drawObject(g, fieldPane, puyos[i], 18, 24+i*Options.CELL_WIDTH);
-			}
-		};
-		nextPane.setPreferredSize(new Dimension(Options.CELL_WIDTH*2+8, Options.CELL_WIDTH*Options.DEFAULT_FIELD_HEIGHT));
-		JLabel nextLabel = new JLabel(Options.getStrings().getNextBtnText()+":");
-		nextLabel.setVerticalAlignment(JLabel.TOP);
-		nextLabel.setPreferredSize(new Dimension(Options.CELL_WIDTH*2, Options.CELL_WIDTH*3));
-		nextLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		nextPane.add(nextLabel);
-		
-		
-		JPanel northPane = new JPanel();
-		northPane.add(Box.createHorizontalGlue());
-		northPane.add(scorePane);
-		northPane.add(Box.createHorizontalGlue());
-		JPanel centerPane = new JPanel();
-		centerPane.add(fieldPane);
-		centerPane.add(nextPane);
-		this.add(northPane, BorderLayout.NORTH);
-		this.add(centerPane, BorderLayout.CENTER);*/
 	}
 	
 	public static void shift(GameObject obj) {

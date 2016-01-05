@@ -114,7 +114,7 @@ public class MainMenu extends JFrame{
 	public void switchToMenuPane() {
 		
 		
-		if (btnPane==null || languageSwitched) {
+		if (btnPane==null) {
 			btnPane = new JPanel();
 			btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.Y_AXIS));
 			Strings strings = Options.getStrings();
@@ -228,6 +228,7 @@ public class MainMenu extends JFrame{
 			        Options.LANGUAGE = (Languages)cb.getSelectedItem();
 			        optionsPane.repaint();
 			        languageSwitched = true;
+					btnPane = null;
 				}
 			});
 			JButton backBtn = new JButton(Options.getStrings().getBackBtnText());

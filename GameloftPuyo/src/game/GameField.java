@@ -125,7 +125,10 @@ public class GameField {
 			for (Puyo puyo:playerPuyo)
 				if (!puyo.getState().isFixed()) 
 					puyo.setState(GameObjectState.FALLING_FAST);
-		if (tickCount%Options.SLOW_DROP_TICKS==1 && (nextPlayerTuple || playerPuyo.isEmpty())) spawnPlayerTuple(0,0);
+		if (tickCount%Options.SLOW_DROP_TICKS==1 && (nextPlayerTuple || playerPuyo.isEmpty()))
+			// if couldn't spawn new puyos, the game is over (no free space to spawn)
+			if (!spawnPlayerTuple(0,0)) return false;
+			
 		updateField();
 		return true;
 	}
@@ -293,7 +296,6 @@ public class GameField {
 				else release(nextTuple.get(0));
 		}
 		//playerPuyo = new ArrayList<Puyo>();
-		GameContext.gameOver(player);
 		return false;
 	}
 	
