@@ -42,31 +42,11 @@ public class GameContext {
 		gameSession.addPlayer(player);
 		if (gameSession.isHost(player)&&gameTimer==null) {
 			gameTimer = new Timer();
-			TimerTask tickDispatchTask = new TimerTask() {
-				@Override
-				public void run() {
-					if (menu==null) return;
-					if (paused) return;
-					//host should update all players elapsed game time
-					for (NetworkPlayer player:gameSession.getPlayers())
-						player.dispatchTick(GameContext.this.player);
-					menu.updateUI();
-					FieldView.repaintAdditionalInfo();
-				}
-			};
-			gameTimer.schedule(tickDispatchTask, Options.GAME_TICK_TIME, Options.GAME_TICK_TIME);
+			gameTimer.schedule(getTickDispatchTask(), Options.GAME_TICK_TIME, Options.GAME_TICK_TIME);
 		}
 		if (uiTimer==null) {
 			uiTimer = new Timer();
-			TimerTask uiUpdateTask = new TimerTask() {
-				@Override
-					public void run() {
-					if (menu==null) return;
-					if (paused) return;
-					menu.repaintUI(true);
-				}
-			};
-			uiTimer.scheduleAtFixedRate(uiUpdateTask, Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
+			uiTimer.schedule(getUIUpdateTask(), Options.GAME_TICK_TIME/Options.getFramesPerTick(), Options.GAME_TICK_TIME/Options.getFramesPerTick());
 		}
 	}
 
@@ -77,7 +57,7 @@ public class GameContext {
 	public static void gameOver(Player p) {
 		paused = true;
 		gameSession.close(p);
-		JOptionPane.showMessageDialog(menu, "Game Over \n Your score is "+p.getScore());
+		JOptionPane.showMessageDialog(menu, Options.getStrings().getGameOverMsg()+p.getScore());
 		menu.switchToMenuPane();
 	}
 	
@@ -102,8 +82,33 @@ public class GameContext {
 		return player;
 	}
 	
-	public static void updateMenu() {
-		menu.updateUI();
+	private TimerTask getTickDispatchTask() {
+		return new TimerTask() {
+			@Override
+			public void run() {
+				if (menu==null) return;
+				if (paused) return;
+				//host should update all players elapsed game time
+				for (NetworkPlayer player:gameSession.getPlayers())
+					player.dispatchTick(GameContext.this.player);
+				menu.updateObjects();
+			}
+		};
 	}
+	
+	private TimerTask getUIUpdateTask() {
+		return new TimerTask() {
+			@Override
+				public void run() {
+				if (menu==null) return;
+				if (paused) return;
+				menu.repaintUI(true);
+			}
+		};
+	}
+		
+	//public static void updateMenu() {
+	//	menu.updateObjects();
+	//}
 	
 }

@@ -51,14 +51,19 @@ public class Options {
 	 * Languages
 	 */
 	
-	public static String LANGUAGE = "ENG";
+	public enum Languages {
+		ENGLISH, RUSSIAN
+	}
+	
+	public static Languages LANGUAGE = Languages.ENGLISH;
 	
 	/**
 	 * get Strings for currently selected language
 	 * @return localized strings wrapper object
 	 */
 	public static Strings getStrings() {
-		//if (LANGUAGE.equals("RUS")) return new StringsRU();
+		if (LANGUAGE.equals(Languages.RUSSIAN)) 
+			return new StringsRU();
 		return new Strings();
 	}
 	

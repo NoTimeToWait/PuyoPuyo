@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -15,13 +16,16 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import engine.GameContext;
 import engine.NetworkPlayer;
 import engine.Options;
+import engine.Options.Languages;
 import engine.Player;
 import engine.Strings;
 import game.GameEvent;
@@ -35,6 +39,7 @@ public class MainMenu extends JFrame{
 	private JPanel currentPane;
 	private JButton continueBtn;
 	private SortedMap<String, Long> actionPerformedMap;
+	public boolean languageSwitched = false;
 	
 	
 	public MainMenu(String title) {
@@ -109,7 +114,7 @@ public class MainMenu extends JFrame{
 	public void switchToMenuPane() {
 		
 		
-		if (btnPane==null) {
+		if (btnPane==null || languageSwitched) {
 			btnPane = new JPanel();
 			btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.Y_AXIS));
 			Strings strings = Options.getStrings();
@@ -185,16 +190,51 @@ public class MainMenu extends JFrame{
 	}
 	
 	public void switchToOptionsPane() {
-		if (optionsPane==null) { 
+		if (optionsPane==null || languageSwitched) {
 			optionsPane = new JPanel();
+			optionsPane.setLayout(new BoxLayout(optionsPane, BoxLayout.Y_AXIS));
+			JComboBox<String> gameSpeedSelector = new JComboBox<String>(Options.getStrings().getGameSpeedStrings());
+			gameSpeedSelector.setSelectedIndex(Options.GAME_TICK_TIME==250? 0:1);
+			gameSpeedSelector.setMaximumSize(new Dimension(80, 30));
+			gameSpeedSelector.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JComboBox<String> cb = (JComboBox<String>)e.getSource();
+					if (cb.getSelectedItem().equals(Options.getStrings().getGameSpeedStrings()[1])) 
+						Options.GAME_TICK_TIME = 450;
+					else Options.GAME_TICK_TIME = 250;
+				}
+			});
+			JComboBox<Languages> languages = new JComboBox<Languages>((Languages[])Options.Languages.values());
+			languages.setMaximumSize(new Dimension(80, 30));
+			for (int i=0; i<Options.Languages.values().length; i++)
+				if (Options.LANGUAGE.equals(Options.Languages.values()[i]))
+						languages.setSelectedIndex(i);
+			languages.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JComboBox<Languages> cb = (JComboBox<Languages>)e.getSource();
+			        Options.LANGUAGE = (Languages)cb.getSelectedItem();
+			        optionsPane.repaint();
+			        languageSwitched = true;
+				}
+			});
 			JButton backBtn = new JButton(Options.getStrings().getBackBtnText());
 			backBtn.addActionListener( new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent arg0) {
+				public void actionPerformed(ActionEvent e) {
 					MainMenu.this.switchToMenuPane();
 				}
 			});
+			optionsPane.add(Box.createVerticalGlue());
+			optionsPane.add(new JLabel(Options.getStrings().getGameSpeedLblText()));
+			optionsPane.add(gameSpeedSelector);
+			optionsPane.add(Box.createVerticalGlue());
+			optionsPane.add(new JLabel(Options.getStrings().getLanguagesLblText()));
+			optionsPane.add(languages);
+			optionsPane.add(Box.createVerticalGlue());
 			optionsPane.add(backBtn);
+			optionsPane.add(Box.createVerticalGlue());
 		}
 		currentPane.setVisible(false);
 		this.getContentPane().remove(currentPane);
@@ -208,10 +248,11 @@ public class MainMenu extends JFrame{
 	 * 
 	 * @param drawAll
 	 */
-	public void updateUI() {
+	public void updateObjects() {
 		if (gamePane==null) return;
 		for (NetworkPlayer player:GameContext.getGameSession().getPlayers()) 
 			gamePane.updateObjects(player);
+		gamePane.updateScore();
 	}
 	
 	public void repaintUI(boolean drawAll) {
